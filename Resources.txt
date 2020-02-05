@@ -1,0 +1,17 @@
+Building map with Leaflet (Angular):
+https://alligator.io/angular/angular-and-leaflet/
+
+Python Map Library:
+https://pypi.org/project/Shapely/
+
+Data Sources:
+1. data.gov
+https://catalog.data.gov/dataset/tiger-line-shapefile-2018-nation-u-s-116th-congressional-district-national
+2.
+https://hifld-geoplatform.opendata.arcgis.com/datasets/6de329cf02ec4e048c93df042678c902
+
+Download the state shapefile and translate to geojson file
+https://mapshaper.org/   
+
+Show the geojson file with earth background
+http://geojson.io/#map=2/20.0/0.0
