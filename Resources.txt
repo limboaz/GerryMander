@@ -1,3 +1,6 @@
+An extremely detailed map that we might want to learn from:
+https://www.nytimes.com/interactive/2018/upshot/election-2016-voting-precinct-maps.html#3.51/35.54/-90.88
+
 Building map with Leaflet (Angular):
 https://alligator.io/angular/angular-and-leaflet/
 
