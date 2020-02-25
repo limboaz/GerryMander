@@ -11,10 +11,10 @@ This directory is split up by county. Each folder refers to a county and holds p
 This directory contains the data in excel worksheet format.
 
 ### Wisconsin
-This directory contains the data in excel worksheet format. There are seperate files for the congressional and presidential 2016 results.
+This directory contains the data in excel worksheet format for county level data. There is precinct level data from MIT dataware.
 
 ## src
 Python scripts for preprocessing the data
 
 ### Python Libraries
-pandas, xlrd, xlwt
+pandas
