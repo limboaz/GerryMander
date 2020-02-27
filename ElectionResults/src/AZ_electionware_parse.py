@@ -88,6 +88,7 @@ for year in years:
                 "OtherVotes": other
             })
     index += 1
+    file.close()
 df_AZ = df_AZ.append(rows, sort=False)
 #filter out non presidential or US House data
 df_AZ = df_AZ[df_AZ['ContestName'].str.contains('presidential electors') | df_AZ['ContestName'].str.contains('rep')]
