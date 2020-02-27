@@ -1,5 +1,4 @@
 import pandas as pd
-#import os
 
 #extract boundaries for values in ElectionWare file
 def county_key_value(county_key, col):
@@ -22,7 +21,7 @@ for year in years:
     file = "../raw_data/Arizona/EW_"+str(year[0:4])+".csv"
     key_EW = pd.read_csv(file)
     #iterate through each county
-    for county in counties_ew[0]:
+    for county in counties_ew[index]:
         #filter key to just the current county
         county_key = key_EW[key_EW.COUNTY == county]
         #open election results for that county
@@ -88,8 +87,9 @@ for year in years:
                 "ReferendumFlag": i[262:264],
                 "OtherVotes": other
             })
-        df_AZ = df_AZ.append(rows, sort=False)
-        #filter out non presidential or US House data
-        df_AZ = df_AZ[df_AZ['ContestName'].str.contains('presidential electors') | df_AZ['ContestName'].str.contains('rep')]
-        csv_file = '../preprocess/Arizona/election_data.csv'
-        df_AZ.to_csv(path_or_buf=csv_file, index=False)
+    index += 1
+df_AZ = df_AZ.append(rows, sort=False)
+#filter out non presidential or US House data
+df_AZ = df_AZ[df_AZ['ContestName'].str.contains('presidential electors') | df_AZ['ContestName'].str.contains('rep')]
+csv_file = '../preprocess/Arizona/election_data_EW.csv'
+df_AZ.to_csv(path_or_buf=csv_file, index=False)
