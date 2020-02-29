@@ -13,25 +13,35 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MapComponent } from './map/map.component';
 import { HttpClientModule } from '@angular/common/http';
+import { AttributeMenuComponent } from './attribute-menu/attribute-menu.component';
+import {MatMenuModule} from '@angular/material/menu';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import {MatRadioModule} from '@angular/material/radio';
+import {MatExpansionModule} from '@angular/material/expansion';
 
 @NgModule({
   declarations: [
     AppComponent,
     MenuComponent,
-    MapComponent
+    MapComponent,
+    AttributeMenuComponent
   ],
-    imports: [
-        MatSliderModule,
-        BrowserModule,
-        BrowserAnimationsModule,
-        LayoutModule,
-        HttpClientModule,
-        MatToolbarModule,
-        MatButtonModule,
-        MatSidenavModule,
-        MatIconModule,
-        MatListModule
-    ],
+  imports: [
+    MatSliderModule,
+    BrowserModule,
+    BrowserAnimationsModule,
+    LayoutModule,
+    HttpClientModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatSidenavModule,
+    MatIconModule,
+    MatListModule,
+    MatMenuModule,
+    MatCheckboxModule,
+    MatRadioModule,
+    MatExpansionModule
+  ],
   providers: [],
   bootstrap: [AppComponent]
 })
