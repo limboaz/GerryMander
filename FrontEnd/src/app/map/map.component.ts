@@ -60,10 +60,12 @@ export class MapComponent implements AfterViewInit {
 
     this.map = l.map('map', {
       center: [39.8282, -98.5795],
-      zoom: 5
+      zoom: 5,
+      zoomControl: false
     });
     tiles.addTo(this.map);
     statesLayer.addTo(this.map);
+    l.control.zoom({position: 'bottomright'}).addTo(this.map);
 
     httpRequest.subscribe(data => {
       const statePrecinctsData = [data[0] as any, data[1] as any, data[2] as any];

@@ -11,3 +11,11 @@
   top: 0;
   z-index: 1;
 }
+
+.sidenav-forms {
+  background-color: #b33163;
+  width: max-content;
+  margin: 15px;
+  color: black;
+  border-radius: 4px;
+}
