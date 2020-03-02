@@ -4,6 +4,8 @@ import {forkJoin} from 'rxjs';
 
 import * as l from 'leaflet';
 import * as statesGeoJSON from '../../assets/us_states_500K.json';
+import {AttributeMenuComponent} from '../attribute-menu/attribute-menu.component';
+import {MenuComponent} from '../menu/menu.component';
 
 const stateStyle = {
   color: '#ff7800',
@@ -78,6 +80,14 @@ export class MapComponent implements AfterViewInit {
       let districtsLayer = [];
       const precinctsLayer = [statePrecincts.AZ, statePrecincts.WI, statePrecincts.OH];
 
+      l.geoJSON(precinctsLayer, {
+        onEachFeature(feature, layer){
+          feature.on('click', e => {
+
+          });
+        }
+      });
+
       for (const key in congressionalDistricts) {
         if (!congressionalDistricts.hasOwnProperty(key)) { continue; }
         const district = l.geoJSON(congressionalDistricts[key], {style: districtStyle});
@@ -102,7 +112,8 @@ export class MapComponent implements AfterViewInit {
           this.map.removeLayer(districtsLayer);
           this.map.addLayer(statesLayer);
         } else if (this.map.getZoom() <= 8) {
-          precinctsLayer.forEach(layer => this.map.removeLayer(layer));
+          // precinctsLayer.forEach(layer => this.map.removeLayer(layer));
+          l.geoJson()
         }
       });
 
