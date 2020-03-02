@@ -6,7 +6,8 @@ import {Component, OnInit} from '@angular/core';
   styleUrls: ['./attribute-menu.component.css']
 })
 export class AttributeMenuComponent implements OnInit {
-  demographicGroups: string[] = ['Black or African American', 'White', 'Asian', 'American Indian or Alaska Native', 'Hispanic'];
+  demographicGroups: string[] = ['Black or African American', 'White', 'Asian', 'American Indian or Alaska Native', 'Hispanic',
+    'Native Hawaiian or Other Pacific Islander'];
 
   constructor() {
   }

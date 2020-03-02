@@ -1,8 +1,8 @@
-import {AfterViewInit, Component} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, Output} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {forkJoin} from 'rxjs';
-
 import * as l from 'leaflet';
+import {exampleLayerGroup, precinctStyle} from './precinct.example';
 import * as statesGeoJSON from '../../assets/us_states_500K.json';
 
 const stateStyle = {
@@ -10,15 +10,11 @@ const stateStyle = {
   weight: 5,
   opacity: 0.65
 };
-const precinctStyle = {
-  color: '#78eeff',
-  weight: 1,
-  opacity: 0.65
-};
+
 const districtStyle = {
   color: '#ff95f8',
   weight: 3,
-  opacity: 0.65
+  fillOpacity: 0.65
 };
 
 const states = (statesGeoJSON as any).features
@@ -38,6 +34,7 @@ const states = (statesGeoJSON as any).features
 
 export class MapComponent implements AfterViewInit {
   private map;
+  @Output() notify = new EventEmitter();
 
   constructor(private http: HttpClient) {
   }
@@ -65,6 +62,7 @@ export class MapComponent implements AfterViewInit {
     });
     tiles.addTo(this.map);
     statesLayer.addTo(this.map);
+    exampleLayerGroup.eachLayer(layer => layer.on('click', e => this.notify.emit(layer.wrapperPrecinct)));
     l.control.zoom({position: 'bottomright'}).addTo(this.map);
 
     httpRequest.subscribe(data => {
@@ -108,6 +106,9 @@ export class MapComponent implements AfterViewInit {
 
       tiles.addTo(this.map);
       l.control.layers({}, {States: statesLayer, 'Congressional Districts': districtsLayer}).addTo(this.map);
+    }, error => {
+      l.control.layers({}, {States: statesLayer, 'Example Layer': exampleLayerGroup}).addTo(this.map);
+      console.log('error retrieving boundaries', error);
     });
   }
 }
