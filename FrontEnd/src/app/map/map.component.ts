@@ -4,10 +4,7 @@ import {forkJoin} from 'rxjs';
 
 import * as l from 'leaflet';
 import * as statesGeoJSON from '../../assets/us_states_500K.json';
-import {AttributeMenuComponent} from '../attribute-menu/attribute-menu.component';
-import {MenuComponent} from '../menu/menu.component';
 import {InfoSidenavComponent} from '../info-sidenav/info-sidenav.component';
-import {V4MAPPED} from 'dns';
 
 const stateStyle = {
   color: '#ff7800',
@@ -42,7 +39,7 @@ const states = (statesGeoJSON as any).features
 
 export class MapComponent implements AfterViewInit {
   @ViewChild(InfoSidenavComponent)
-  static infoSidenav: InfoSidenavComponent;
+  public infoSidenav: InfoSidenavComponent;
 
   public map;
 
@@ -73,32 +70,15 @@ export class MapComponent implements AfterViewInit {
     tiles.addTo(this.map);
     statesLayer.addTo(this.map);
     l.control.zoom({position: 'bottomright'}).addTo(this.map);
+    const onEachFeature = (feature, layer) => layer.on('click', e => this.infoSidenav.toggle());
 
     httpRequest.subscribe(data => {
       const statePrecinctsData = [data[0] as any, data[1] as any, data[2] as any];
       const congressionalDistricts = data[3] as any;
       const statePrecincts = {
-        AZ: l.geoJSON(statePrecinctsData[0].geometries, {
-          style: precinctStyle,
-          onEachFeature(feature, layer) {
-            layer.on('click', e => {
-              MapComponent.infoSidenav.toggle();
-            });
-        }}),
-        WI: l.geoJSON(statePrecinctsData[1].geometries, {
-          style: precinctStyle,
-          onEachFeature(feature, layer) {
-            layer.on('click', e => {
-              MapComponent.infoSidenav.toggle();
-            });
-        }}),
-        OH: l.geoJSON(statePrecinctsData[2].geometries, {
-          style: precinctStyle,
-          onEachFeature(feature, layer) {
-            layer.on('click', e => {
-              MapComponent.infoSidenav.toggle();
-            });
-          }})
+        AZ: l.geoJSON(statePrecinctsData[0].geometries, {style: precinctStyle, onEachFeature}),
+        WI: l.geoJSON(statePrecinctsData[1].geometries, {style: precinctStyle, onEachFeature}),
+        OH: l.geoJSON(statePrecinctsData[2].geometries, {style: precinctStyle, onEachFeature})
       };
       const precinctsLayer = [statePrecincts.AZ, statePrecincts.OH, statePrecincts.WI];
       let districtsLayer = [];
