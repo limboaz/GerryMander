@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
 
 @Component({
@@ -7,6 +7,7 @@ import {MatSidenav} from '@angular/material/sidenav';
   styleUrls: ['./info-sidenav.component.css']
 })
 export class InfoSidenavComponent implements OnInit {
+  @ViewChild(MatSidenav)
   public sidenav: MatSidenav;
   constructor() { }
 
