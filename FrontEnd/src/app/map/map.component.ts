@@ -1,4 +1,4 @@
-import {AfterViewInit, Component} from '@angular/core';
+import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {forkJoin} from 'rxjs';
 
@@ -6,6 +6,8 @@ import * as l from 'leaflet';
 import * as statesGeoJSON from '../../assets/us_states_500K.json';
 import {AttributeMenuComponent} from '../attribute-menu/attribute-menu.component';
 import {MenuComponent} from '../menu/menu.component';
+import {InfoSidenavComponent} from '../info-sidenav/info-sidenav.component';
+import {V4MAPPED} from 'dns';
 
 const stateStyle = {
   color: '#ff7800',
@@ -39,7 +41,10 @@ const states = (statesGeoJSON as any).features
 })
 
 export class MapComponent implements AfterViewInit {
-  private map;
+  @ViewChild(InfoSidenavComponent)
+  static infoSidenav: InfoSidenavComponent;
+
+  public map;
 
   constructor(private http: HttpClient) {
   }
@@ -73,20 +78,30 @@ export class MapComponent implements AfterViewInit {
       const statePrecinctsData = [data[0] as any, data[1] as any, data[2] as any];
       const congressionalDistricts = data[3] as any;
       const statePrecincts = {
-        AZ: l.geoJSON(statePrecinctsData[0].geometries, {style: precinctStyle}),
-        WI: l.geoJSON(statePrecinctsData[1].geometries, {style: precinctStyle}),
-        OH: l.geoJSON(statePrecinctsData[2].geometries, {style: precinctStyle})
+        AZ: l.geoJSON(statePrecinctsData[0].geometries, {
+          style: precinctStyle,
+          onEachFeature(feature, layer) {
+            layer.on('click', e => {
+              MapComponent.infoSidenav.toggle();
+            });
+        }}),
+        WI: l.geoJSON(statePrecinctsData[1].geometries, {
+          style: precinctStyle,
+          onEachFeature(feature, layer) {
+            layer.on('click', e => {
+              MapComponent.infoSidenav.toggle();
+            });
+        }}),
+        OH: l.geoJSON(statePrecinctsData[2].geometries, {
+          style: precinctStyle,
+          onEachFeature(feature, layer) {
+            layer.on('click', e => {
+              MapComponent.infoSidenav.toggle();
+            });
+          }})
       };
+      const precinctsLayer = [statePrecincts.AZ, statePrecincts.OH, statePrecincts.WI];
       let districtsLayer = [];
-      const precinctsLayer = [statePrecincts.AZ, statePrecincts.WI, statePrecincts.OH];
-
-      l.geoJSON(precinctsLayer, {
-        onEachFeature(feature, layer){
-          feature.on('click', e => {
-
-          });
-        }
-      });
 
       for (const key in congressionalDistricts) {
         if (!congressionalDistricts.hasOwnProperty(key)) { continue; }
@@ -112,8 +127,7 @@ export class MapComponent implements AfterViewInit {
           this.map.removeLayer(districtsLayer);
           this.map.addLayer(statesLayer);
         } else if (this.map.getZoom() <= 8) {
-          // precinctsLayer.forEach(layer => this.map.removeLayer(layer));
-          l.geoJson()
+          precinctsLayer.forEach(layer => this.map.removeLayer(layer));
         }
       });
 
