@@ -21,7 +21,10 @@
         </button>
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
-      <button mat-button aria-label="Add new neighbor" (click)="addNeighbor()" *ngIf="selectedPrecinct">
+      <button mat-button aria-label="Combine precincts" (click)="combiningPrecincts = true;">
+        Combine two adjacent precincts
+      </button>
+      <button mat-button aria-label="Add new neighbor" (click)="addingNeighbor = true;" *ngIf="selectedPrecinct">
         Add neighbor to selected precinct
       </button>
       <button mat-button *ngIf="addingNeighbor" (click)="cancelAdd()">Currently Adding Neighbor (Click here to cancel)</button>

@@ -33,10 +33,15 @@ const states = (statesGeoJSON as any).features
 })
 
 export class MapComponent implements AfterViewInit {
-  private map;
+  public map;
+  public exampleLayerGroup;
   @Output() notify = new EventEmitter();
 
   constructor(private http: HttpClient) {
+  }
+
+  exampleOnClick(layer) {
+    this.notify.emit(layer.wrapperPrecinct);
   }
 
   ngAfterViewInit(): void {
@@ -62,7 +67,8 @@ export class MapComponent implements AfterViewInit {
     });
     tiles.addTo(this.map);
     statesLayer.addTo(this.map);
-    exampleLayerGroup.eachLayer(layer => layer.on('click', e => this.notify.emit(layer.wrapperPrecinct)));
+    this.exampleLayerGroup = exampleLayerGroup;
+    this.exampleLayerGroup.eachLayer(layer => layer.on('click', e => this.exampleOnClick(layer)));
     l.control.zoom({position: 'bottomright'}).addTo(this.map);
 
     httpRequest.subscribe(data => {
