@@ -1,15 +1,15 @@
-import {AfterViewInit, Component, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ViewChild, EventEmitter, Output} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {forkJoin} from 'rxjs';
-
 import * as l from 'leaflet';
+import {exampleLayerGroup, precinctStyle} from './precinct.example';
 import * as statesGeoJSON from '../../assets/us_states_500K.json';
 import * as demographic from '../../assets/demographic.json';
 import * as comments from '../../assets/comments.json';
 import * as presidential from '../../assets/election.json';
 import {InfoSidenavComponent} from '../info-sidenav/info-sidenav.component';
-import { icon, Marker } from 'leaflet';
 import {Demographic} from '../demographic.model';
+import {icon, Marker} from 'leaflet';
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
 const shadowUrl = 'assets/marker-shadow.png';
@@ -30,14 +30,10 @@ const stateStyle = {
   weight: 5,
   opacity: 0.65
 };
-const precinctStyle = {
-  color: '#78eeff',
-  weight: 1,
-  opacity: 0.65
-};
+
 const districtStyle = {
   color: '#ff95f8',
-  weight: 3,
+  weight: 2,
   opacity: 0.65
 };
 
@@ -57,12 +53,18 @@ const states = (statesGeoJSON as any).features
 })
 
 export class MapComponent implements AfterViewInit {
+  public map;
+  public exampleLayerGroup;
+  @Output() notify = new EventEmitter();
   @ViewChild(InfoSidenavComponent)
   public infoSidenav: InfoSidenavComponent;
 
-  public map;
 
   constructor(private http: HttpClient) {
+  }
+
+  exampleOnClick(layer) {
+    this.notify.emit(layer.wrapperPrecinct);
   }
 
   ngAfterViewInit(): void {
@@ -91,6 +93,8 @@ export class MapComponent implements AfterViewInit {
     });
     tiles.addTo(this.map);
     statesLayer.addTo(this.map);
+    this.exampleLayerGroup = exampleLayerGroup;
+    this.exampleLayerGroup.eachLayer(layer => layer.on('click', e => this.exampleOnClick(layer)));
     l.control.zoom({position: 'bottomright'}).addTo(this.map);
     const marker = l.marker([0, 0]).addTo(this.map);
     marker.on('click', e => this.infoSidenav.toggle());
@@ -168,7 +172,14 @@ export class MapComponent implements AfterViewInit {
       });
 
       tiles.addTo(this.map);
-      l.control.layers({}, {States: statesLayer, 'Congressional Districts': districtsLayer}).addTo(this.map);
+      l.control.layers({}, {
+        States: statesLayer,
+        'Congressional Districts': districtsLayer,
+        'Example Layer': exampleLayerGroup
+      }).addTo(this.map);
+    }, error => {
+      l.control.layers({}, {States: statesLayer, 'Example Layer': exampleLayerGroup}).addTo(this.map);
+      console.log('error retrieving boundaries', error);
     });
   }
 }
