@@ -13,6 +13,8 @@
 }
 
 .sidenav-forms {
+  display: flex;
+  flex-direction: column;
   background-color: #b33163;
   width: max-content;
   margin: 15px;
