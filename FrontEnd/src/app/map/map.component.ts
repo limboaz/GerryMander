@@ -4,8 +4,12 @@ import {forkJoin} from 'rxjs';
 
 import * as l from 'leaflet';
 import * as statesGeoJSON from '../../assets/us_states_500K.json';
+import * as demographic from '../../assets/demographic.json';
+import * as comments from '../../assets/comments.json';
+import * as presidential from '../../assets/election.json';
 import {InfoSidenavComponent} from '../info-sidenav/info-sidenav.component';
 import { icon, Marker } from 'leaflet';
+import {Demographic} from '../demographic.model';
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
 const shadowUrl = 'assets/marker-shadow.png';
@@ -68,6 +72,8 @@ export class MapComponent implements AfterViewInit {
     const az = this.http.get('assets/az_example.json');
     const districts = this.http.get('assets/congressional_districts.json');
     const httpRequest = forkJoin([az, wi, oh, districts]);
+    const demographicData = new Demographic();
+    this.infoSidenav.demographicGroups = demographicData;
 
     const tiles = l.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; ' +
@@ -92,6 +98,23 @@ export class MapComponent implements AfterViewInit {
       return e => {
         marker.setLatLng(e.latlng);
         // load the info of this feature to infoSidenav here
+        this.infoSidenav.comment = '';
+        for (const result of presidential.presidential) {
+          if (result.uid === feature.properties.uid) {
+            this.infoSidenav.presidentialGroups.setData(result.uid, result.candidate, result.party, result.voteTotal);
+          }
+        }
+        for (const precinct of demographic.precincts) {
+          if (precinct.uid === feature.properties.uid) {
+            demographicData.setData(precinct.uid, precinct.total, precinct.white, precinct.black,
+              precinct.asian, precinct.hawaiian, precinct.others);
+          }
+        }
+        for (const comment of comments.comments) {
+          if (comment.uid === feature.properties.uid) {
+            this.infoSidenav.comment = comment.comment;
+          }
+        }
       };
     };
     const onMouseOver = (feature, layer) => {

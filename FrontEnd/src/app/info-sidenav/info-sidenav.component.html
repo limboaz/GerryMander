@@ -1,5 +1,55 @@
 <mat-sidenav class="sidenav" fixedInViewport
              [mode]="'over'"
              [opened]="false">
-  <app-attribute-menu></app-attribute-menu>
+  <mat-accordion>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Election Data
+        </mat-panel-title>
+        <mat-panel-description>
+          Presidential and Congressional Elections
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <mat-list>
+        <mat-list-item>Candidate: {{presidentialGroups.candidate}}</mat-list-item>
+        <mat-list-item>Party: {{presidentialGroups.party}}</mat-list-item>
+        <mat-list-item>Total Vote: {{presidentialGroups.voteTotal}}</mat-list-item>
+      </mat-list>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Demographic Data
+        </mat-panel-title>
+        <mat-panel-description>
+          Show demographic data
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <mat-list>
+        <mat-list-item>Total: {{demographicGroups.total}}</mat-list-item>
+        <mat-list-item>White: {{demographicGroups.white}}</mat-list-item>
+        <mat-list-item>Black or African American: {{demographicGroups.black}}</mat-list-item>
+        <mat-list-item>Asian: {{demographicGroups.asian}}</mat-list-item>
+        <mat-list-item>Native Hawaiian and Other Pacific Islander : {{demographicGroups.hawaiian}}</mat-list-item>
+        <mat-list-item>Hispanic: 0</mat-list-item>
+        <mat-list-item>Others: {{demographicGroups.others}}</mat-list-item>
+      </mat-list>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Comment
+        </mat-panel-title>
+        <mat-panel-description>
+          Comment on this precinct
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <mat-list>
+        {{comment}}
+      </mat-list>
+    </mat-expansion-panel>
+  </mat-accordion>
 </mat-sidenav>
