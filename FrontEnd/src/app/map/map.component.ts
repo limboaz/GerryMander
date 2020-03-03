@@ -5,6 +5,21 @@ import {forkJoin} from 'rxjs';
 import * as l from 'leaflet';
 import * as statesGeoJSON from '../../assets/us_states_500K.json';
 import {InfoSidenavComponent} from '../info-sidenav/info-sidenav.component';
+import { icon, Marker } from 'leaflet';
+const iconRetinaUrl = 'assets/marker-icon-2x.png';
+const iconUrl = 'assets/marker-icon.png';
+const shadowUrl = 'assets/marker-shadow.png';
+const iconDefault = icon({
+  iconRetinaUrl,
+  iconUrl,
+  shadowUrl,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  tooltipAnchor: [16, -28],
+  shadowSize: [41, 41]
+});
+Marker.prototype.options.icon = iconDefault;
 
 const stateStyle = {
   color: '#ff7800',
@@ -47,9 +62,10 @@ export class MapComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    const az = this.http.get('assets/arizona.json');
-    const wi = this.http.get('assets/wisconsin_wards.json');
-    const oh = this.http.get('assets/ohio_precincts.json');
+    // const az = this.http.get('assets/arizona.json');
+    const wi = this.http.get('assets/wi_example.json');
+    const oh = this.http.get('assets/oh_example.json');
+    const az = this.http.get('assets/az_example.json');
     const districts = this.http.get('assets/congressional_districts.json');
     const httpRequest = forkJoin([az, wi, oh, districts]);
 
@@ -70,15 +86,32 @@ export class MapComponent implements AfterViewInit {
     tiles.addTo(this.map);
     statesLayer.addTo(this.map);
     l.control.zoom({position: 'bottomright'}).addTo(this.map);
-    const onEachFeature = (feature, layer) => layer.on('click', e => this.infoSidenav.toggle());
+    const marker = l.marker([0, 0]).addTo(this.map);
+    marker.on('click', e => this.infoSidenav.toggle());
+    const onMapClick = (feature, layer) => {
+      return e => {
+        marker.setLatLng(e.latlng);
+        // load the info of this feature to infoSidenav here
+      };
+    };
+    const onMouseOver = (feature, layer) => {
+      console.log(feature);
+      return e => layer.bindTooltip(feature.properties.name).openTooltip();
+    };
+    const onEachFeature = (feature, layer) => {
+      layer.on({
+        click: onMapClick(feature, layer),
+        mouseover: onMouseOver(feature, layer)
+      });
+    };
 
     httpRequest.subscribe(data => {
       const statePrecinctsData = [data[0] as any, data[1] as any, data[2] as any];
       const congressionalDistricts = data[3] as any;
       const statePrecincts = {
-        AZ: l.geoJSON(statePrecinctsData[0].geometries, {style: precinctStyle, onEachFeature}),
-        WI: l.geoJSON(statePrecinctsData[1].geometries, {style: precinctStyle, onEachFeature}),
-        OH: l.geoJSON(statePrecinctsData[2].geometries, {style: precinctStyle, onEachFeature})
+        AZ: l.geoJSON(statePrecinctsData[0], {style: precinctStyle, onEachFeature}),
+        WI: l.geoJSON(statePrecinctsData[1], {style: precinctStyle, onEachFeature}),
+        OH: l.geoJSON(statePrecinctsData[2], {style: precinctStyle, onEachFeature})
       };
       const precinctsLayer = [statePrecincts.AZ, statePrecincts.OH, statePrecincts.WI];
       let districtsLayer = [];
