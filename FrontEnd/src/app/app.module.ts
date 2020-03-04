@@ -10,7 +10,8 @@ import {MapComponent} from './map/map.component';
 import {HttpClientModule} from '@angular/common/http';
 import {AttributeMenuComponent} from './attribute-menu/attribute-menu.component';
 import {MaterialModules} from './material.module';
-import { InfoSidenavComponent } from './info-sidenav/info-sidenav.component';
+import {InfoSidenavComponent} from './info-sidenav/info-sidenav.component';
+import {ErrorListComponent} from './error-list/error-list.component';
 
 
 @NgModule({
@@ -19,7 +20,8 @@ import { InfoSidenavComponent } from './info-sidenav/info-sidenav.component';
     MenuComponent,
     MapComponent,
     AttributeMenuComponent,
-    InfoSidenavComponent
+    InfoSidenavComponent,
+    ErrorListComponent
   ],
   imports: [
     MatSliderModule,

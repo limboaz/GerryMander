@@ -21,3 +21,15 @@
   color: black;
   border-radius: 4px;
 }
+
+.map-edit-buttons {
+  display: flex;
+  flex-direction: column;
+  background-color: #ff4294;
+  width: max-content;
+  margin: 15px;
+  color: black;
+  border-radius: 4px;
+  position: fixed;
+  right: 5px;
+}

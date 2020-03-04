@@ -21,13 +21,27 @@
         </button>
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
-      <button mat-button aria-label="Combine precincts" (click)="combiningPrecincts = true;">
-        Combine two adjacent precincts
+
+      <mat-divider></mat-divider>
+      <app-error-list (combineEvent)="combiningPrecincts = true; onNotify($event)"></app-error-list>
+    </div>
+    <div class="map-edit-buttons">
+      <button mat-icon-button aria-label="Combine precincts"
+              matTooltipPosition="before" matTooltip="Select and Merge two Precincts" (click)="combiningPrecincts = true;">
+        <mat-icon>call_merge</mat-icon>
       </button>
-      <button mat-button aria-label="Add new neighbor" (click)="addingNeighbor = true;" *ngIf="selectedPrecinct">
-        Add neighbor to selected precinct
+      <button mat-icon-button
+              matTooltipPosition="before" matTooltip="Cancel combining precincts" *ngIf="combiningPrecincts" (click)="cancelCombine()">
+        <mat-icon>clear</mat-icon>
       </button>
-      <button mat-button *ngIf="addingNeighbor" (click)="cancelAdd()">Currently Adding Neighbor (Click here to cancel)</button>
+      <button mat-icon-button aria-label="Add new neighbor"
+              matTooltipPosition="before" matTooltip="Add Neighbor to Selected Precinct" (click)="addingNeighbor = true;" *ngIf="selectedPrecinct">
+        <mat-icon>add_circle</mat-icon>
+      </button>
+      <button mat-icon-button
+              matTooltipPosition="before" matTooltip="Currently Adding Neighbor (Click here to cancel)" *ngIf="addingNeighbor" (click)="cancelAdd()">
+        <mat-icon>clear</mat-icon>
+      </button>
     </div>
     <app-map (notify)="onNotify($event)"></app-map>
   </mat-sidenav-content>

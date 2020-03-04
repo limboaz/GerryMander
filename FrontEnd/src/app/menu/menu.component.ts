@@ -2,14 +2,9 @@ import {Component, ViewChild} from '@angular/core';
 import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 import {Observable} from 'rxjs';
 import {map, shareReplay} from 'rxjs/operators';
-import {PrecinctExample} from '../map/precinct.example';
+import {PrecinctExample, selectedStyle} from '../map/precinct.example';
 import {MapComponent} from '../map/map.component';
-
-export const selectedStyle = {
-  color: '#569335',
-  weight: 2,
-  opacity: 1.00
-};
+import {ErrorListComponent} from '../error-list/error-list.component';
 
 @Component({
   selector: 'app-menu',
@@ -18,7 +13,9 @@ export const selectedStyle = {
 })
 export class MenuComponent {
   @ViewChild(MapComponent)
-  private mapComponent: MapComponent;
+  public mapComponent: MapComponent;
+  @ViewChild(ErrorListComponent)
+  public errorListComponent: ErrorListComponent;
   public selectedPrecinct: PrecinctExample;
   public addingNeighbor = false;
   public combiningPrecincts = false;
@@ -37,8 +34,14 @@ export class MenuComponent {
         if (combined) {
           combined.layer.addTo(this.mapComponent.map);
           combined.layer.on('click', me => this.mapComponent.exampleOnClick(combined.layer));
+          combined.resetNeighbors();
           this.mapComponent.map.removeLayer(this.selectedPrecinct.layer);
           this.mapComponent.map.removeLayer(e.layer);
+
+          if (this.selectedPrecinct.error === 'GHOST') {
+            this.errorListComponent.removeError(this.selectedPrecinct);
+          }
+
           this.selectedPrecinct = undefined;
           this.combiningPrecincts = false;
         }
@@ -49,14 +52,14 @@ export class MenuComponent {
     } else if (this.addingNeighbor) {
       if (this.selectedPrecinct.addNeighbor(e)) {
         this.addingNeighbor = false;
-        this.selectedPrecinct.highlightNeighbors();
+        this.selectedPrecinct.resetNeighbors();
         this.selectedPrecinct.highlightNeighbors();
       }
     } else {
       if (this.selectedPrecinct) {
         this.selectedPrecinct.layer.resetStyle();
-        this.selectedPrecinct.highlightNeighbors();
-      }
+        this.selectedPrecinct.resetNeighbors();
+      } // a comment
       if (this.selectedPrecinct !== e) {
         this.selectedPrecinct = e;
         this.selectedPrecinct.layer.setStyle(selectedStyle);
@@ -69,5 +72,10 @@ export class MenuComponent {
 
   cancelAdd() {
     this.addingNeighbor = false;
+  }
+
+  cancelCombine() {
+    this.combiningPrecincts = false;
+    this.selectedPrecinct = undefined;
   }
 }

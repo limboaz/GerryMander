@@ -2,7 +2,7 @@ import {AfterViewInit, Component, ViewChild, EventEmitter, Output} from '@angula
 import {HttpClient} from '@angular/common/http';
 import {forkJoin} from 'rxjs';
 import * as l from 'leaflet';
-import {exampleLayerGroup, precinctStyle} from './precinct.example';
+import {precinctStyle, errorStyle} from './precinct.example';
 import * as statesGeoJSON from '../../assets/us_states_500K.json';
 import * as demographic from '../../assets/demographic.json';
 import * as comments from '../../assets/comments.json';
@@ -10,6 +10,8 @@ import * as presidential from '../../assets/election.json';
 import {InfoSidenavComponent} from '../info-sidenav/info-sidenav.component';
 import {Demographic} from '../demographic.model';
 import {icon, Marker} from 'leaflet';
+import {MapService} from '../map.service';
+
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
 const shadowUrl = 'assets/marker-shadow.png';
@@ -60,7 +62,8 @@ export class MapComponent implements AfterViewInit {
   public infoSidenav: InfoSidenavComponent;
 
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private mapService: MapService) {
+    this.exampleLayerGroup = this.mapService.exampleLayerGroup;
   }
 
   exampleOnClick(layer) {
@@ -68,32 +71,19 @@ export class MapComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    this.map = this.mapService.currentMap.subscribe(map => this.map = map);
+    this.mapService.init();
     // const az = this.http.get('assets/arizona.json');
     const wi = this.http.get('assets/wi_example.json');
-    const oh = this.http.get('assets/oh_example.json');
+    const oh = this.http.get('assets/ohio.json');
     const az = this.http.get('assets/az_example.json');
     const districts = this.http.get('assets/congressional_districts.json');
     const httpRequest = forkJoin([az, wi, oh, districts]);
     const demographicData = new Demographic();
     this.infoSidenav.demographicGroups = demographicData;
-
-    const tiles = l.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; ' +
-        '<a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd',
-      maxZoom: 19,
-      minZoom: 5
-    });
     const statesLayer = l.layerGroup(states); // Layer to show the state borders
 
-    this.map = l.map('map', {
-      center: [39.8282, -98.5795],
-      zoom: 5,
-      zoomControl: false
-    });
-    tiles.addTo(this.map);
     statesLayer.addTo(this.map);
-    this.exampleLayerGroup = exampleLayerGroup;
     this.exampleLayerGroup.eachLayer(layer => layer.on('click', e => this.exampleOnClick(layer)));
     l.control.zoom({position: 'bottomright'}).addTo(this.map);
     const marker = l.marker([0, 0]).addTo(this.map);
@@ -122,10 +112,12 @@ export class MapComponent implements AfterViewInit {
       };
     };
     const onMouseOver = (feature, layer) => {
-      console.log(feature);
       return e => layer.bindTooltip(feature.properties.name).openTooltip();
     };
     const onEachFeature = (feature, layer) => {
+      if (feature.properties.hasError) {
+        layer.setStyle(errorStyle);
+      }
       layer.on({
         click: onMapClick(feature, layer),
         mouseover: onMouseOver(feature, layer)
@@ -138,7 +130,7 @@ export class MapComponent implements AfterViewInit {
       const statePrecincts = {
         AZ: l.geoJSON(statePrecinctsData[0], {style: precinctStyle, onEachFeature}),
         WI: l.geoJSON(statePrecinctsData[1], {style: precinctStyle, onEachFeature}),
-        OH: l.geoJSON(statePrecinctsData[2], {style: precinctStyle, onEachFeature})
+        OH: l.geoJSON(statePrecinctsData[2], {style: precinctStyle})
       };
       const precinctsLayer = [statePrecincts.AZ, statePrecincts.OH, statePrecincts.WI];
       let districtsLayer = [];
@@ -171,14 +163,13 @@ export class MapComponent implements AfterViewInit {
         }
       });
 
-      tiles.addTo(this.map);
       l.control.layers({}, {
         States: statesLayer,
         'Congressional Districts': districtsLayer,
-        'Example Layer': exampleLayerGroup
+        'Example Layer': this.exampleLayerGroup
       }).addTo(this.map);
     }, error => {
-      l.control.layers({}, {States: statesLayer, 'Example Layer': exampleLayerGroup}).addTo(this.map);
+      l.control.layers({}, {States: statesLayer, 'Example Layer': this.exampleLayerGroup}).addTo(this.map);
       console.log('error retrieving boundaries', error);
     });
   }

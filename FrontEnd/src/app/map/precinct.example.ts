@@ -1,6 +1,4 @@
 import * as l from 'leaflet';
-import * as exampleJSON from '../../assets/example.json';
-import intersect from '@turf/intersect';
 import union from '@turf/union';
 
 export const precinctStyle = {
@@ -9,17 +7,48 @@ export const precinctStyle = {
   opacity: 1.00
 };
 
+export const ghostStyle = {
+  color: '#000000',
+  weight: 2,
+  fillOpacity: 0
+};
+
+export const errorStyle = {
+  color: '#3b7693',
+  fillColor: '#932f38',
+  weight: 2,
+  fillOpacity: 0.65
+};
+
+export const selectedStyle = {
+  color: '#569335',
+  weight: 2,
+  opacity: 1.00
+};
+
 const highlightStyle = {
-  color: '#da0023',
+  color: '#dab037',
   weight: 2,
   opacity: 1.00
 };
 
 export class PrecinctExample {
+  missingNeighbor: PrecinctExample;
 
   constructor(layerGeoJson) {
     this.feature = layerGeoJson;
-    this.layer = l.geoJSON(layerGeoJson, {style: precinctStyle});
+    if (!layerGeoJson.properties.hasError) {
+      this.layer = l.geoJSON(layerGeoJson, {style: precinctStyle});
+    } else {
+      this.error = layerGeoJson.properties.error.type;
+      switch (layerGeoJson.properties.error.type) {
+        case 'GHOST':
+          this.layer = l.geoJSON(layerGeoJson, {style: ghostStyle});
+          break;
+        default:
+          this.layer = l.geoJSON(layerGeoJson, {style: errorStyle});
+      }
+    }
     this.layer.wrapperPrecinct = this;
   }
 
@@ -27,9 +56,11 @@ export class PrecinctExample {
   public layer: l.Layer;
   public highlighted = false;
   public feature;
+  public error;
 
   static joinPrecincts(precinct1: PrecinctExample, precinct2: PrecinctExample) {
-    if (!precinct1.neighbors.includes(precinct2) || !precinct2.neighbors.includes(precinct1)) {
+    if (!(precinct1.error === 'GHOST' || precinct2.error === 'GHOST')
+      && (!precinct1.neighbors.includes(precinct2) || !precinct2.neighbors.includes(precinct1))) {
       console.log('Cannot join precincts that are not neighbors');
       return undefined;
     }
@@ -48,6 +79,13 @@ export class PrecinctExample {
     newPrecinct.neighbors = unionNeighbors;
 
     return newPrecinct;
+  }
+
+  resetNeighbors(): void {
+    for (const n of this.neighbors) {
+      n.layer.resetStyle();
+    }
+    this.highlighted = false;
   }
 
   highlightNeighbors(): void {
@@ -74,15 +112,3 @@ export class PrecinctExample {
     }
   }
 }
-
-const examplePrecincts = (exampleJSON as any).features
-  .map(e => new PrecinctExample(e));
-
-for (const example of examplePrecincts) {
-  example.neighbors = examplePrecincts.filter(e => {
-    const i = examplePrecincts.indexOf(example);
-    return (exampleJSON as any).features[i].properties.neighbors.includes(examplePrecincts.indexOf(e));
-  });
-}
-
-export const exampleLayerGroup = l.layerGroup(examplePrecincts.map(e => e.layer));
