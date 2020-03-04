@@ -21,13 +21,14 @@ export class ErrorListComponent implements OnInit {
 
   goToError(error: PrecinctExample) {
     error.layer.setStyle(selectedStyle);
+    error.resetNeighbors();
     error.highlightNeighbors();
     this.map.fitBounds(error.layer.getBounds());
   }
 
   addMissingNeighbor(error: PrecinctExample) {
     error.addNeighbor(error.missingNeighbor);
-    error.highlightNeighbors();
+    error.resetNeighbors();
     error.highlightNeighbors();
     this.removeError(error);
   }

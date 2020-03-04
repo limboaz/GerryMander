@@ -6,11 +6,12 @@ import {precinctStyle, errorStyle} from './precinct.example';
 import * as statesGeoJSON from '../../assets/us_states_500K.json';
 import * as demographic from '../../assets/demographic.json';
 import * as comments from '../../assets/comments.json';
-import * as presidential from '../../assets/election.json';
+import * as presidential from '../../assets/election_az.json';
 import {InfoSidenavComponent} from '../info-sidenav/info-sidenav.component';
 import {Demographic} from '../demographic.model';
 import {icon, Marker} from 'leaflet';
 import {MapService} from '../map.service';
+import {Candidate, ElectionData} from '../presidential.model';
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
@@ -75,10 +76,11 @@ export class MapComponent implements AfterViewInit {
     this.mapService.init();
     // const az = this.http.get('assets/arizona.json');
     const wi = this.http.get('assets/wi_example.json');
-    const oh = this.http.get('assets/ohio.json');
+    const oh = this.http.get('assets/oh_example.json');
     const az = this.http.get('assets/az_example.json');
     const districts = this.http.get('assets/congressional_districts.json');
-    const httpRequest = forkJoin([az, wi, oh, districts]);
+    const realAz = this.http.get('assets/arizona.json');
+    const httpRequest = forkJoin([az, wi, oh, districts, realAz]);
     const demographicData = new Demographic();
     this.infoSidenav.demographicGroups = demographicData;
     const statesLayer = l.layerGroup(states); // Layer to show the state borders
@@ -89,15 +91,38 @@ export class MapComponent implements AfterViewInit {
     const marker = l.marker([0, 0]).addTo(this.map);
     marker.on('click', e => this.infoSidenav.toggle());
     const onMapClick = (feature, layer) => {
+      let presidentialData;
+      const congressionalData = [];
+      for (const year of presidential.Years) {
+        if (year.presidential) {
+          const presidentialCandidates = [];
+          for (const precinctElection of year.presidential) {
+            if (precinctElection.uid === feature.properties.uid) {
+              for (const candidate of precinctElection.candidates) {
+                presidentialCandidates.push(new Candidate(candidate));
+              }
+              break;
+            }
+          }
+          presidentialData = new ElectionData(presidentialCandidates, 'presidential', year.year, feature.properties.uid);
+        }
+        const congressionalCandidates = [];
+        for (const precinctElection of year.congressional) {
+          if (precinctElection.uid === feature.properties.uid) {
+            for (const candidate of precinctElection.candidates) {
+              congressionalCandidates.push(new Candidate(candidate));
+            }
+            break;
+          }
+        }
+        congressionalData.push(new ElectionData(congressionalCandidates, 'congressional', year.year, feature.properties.uid));
+      }
       return e => {
         marker.setLatLng(e.latlng);
         // load the info of this feature to infoSidenav here
         this.infoSidenav.comment = '';
-        for (const result of presidential.presidential) {
-          if (result.uid === feature.properties.uid) {
-            this.infoSidenav.presidentialGroups.setData(result.uid, result.candidate, result.party, result.voteTotal);
-          }
-        }
+        this.infoSidenav.presidentialData = presidentialData;
+        this.infoSidenav.congressionalData = congressionalData;
         for (const precinct of demographic.precincts) {
           if (precinct.uid === feature.properties.uid) {
             demographicData.setData(precinct.uid, precinct.total, precinct.white, precinct.black,
@@ -130,16 +155,21 @@ export class MapComponent implements AfterViewInit {
       const statePrecincts = {
         AZ: l.geoJSON(statePrecinctsData[0], {style: precinctStyle, onEachFeature}),
         WI: l.geoJSON(statePrecinctsData[1], {style: precinctStyle, onEachFeature}),
-        OH: l.geoJSON(statePrecinctsData[2], {style: precinctStyle})
+        OH: l.geoJSON(statePrecinctsData[2], {style: precinctStyle, onEachFeature})
       };
       const precinctsLayer = [statePrecincts.AZ, statePrecincts.OH, statePrecincts.WI];
       let districtsLayer = [];
-
+      const realAzLayer = l.geoJSON(data[4], {style: precinctStyle});
       for (const key in congressionalDistricts) {
-        if (!congressionalDistricts.hasOwnProperty(key)) { continue; }
+        if (!congressionalDistricts.hasOwnProperty(key)) {
+          continue;
+        }
         const district = l.geoJSON(congressionalDistricts[key], {style: districtStyle});
         district.on('click', e => {
           this.map.setView(e.latlng, 9);
+          if (key === 'AZ') {
+            this.map.addLayer(realAzLayer);
+          }
           this.map.addLayer(statePrecincts[key]);
         });
         districtsLayer.push(district);
@@ -160,13 +190,15 @@ export class MapComponent implements AfterViewInit {
           this.map.addLayer(statesLayer);
         } else if (this.map.getZoom() <= 8) {
           precinctsLayer.forEach(layer => this.map.removeLayer(layer));
+          this.map.removeLayer(realAzLayer);
         }
       });
 
       l.control.layers({}, {
         States: statesLayer,
         'Congressional Districts': districtsLayer,
-        'Example Layer': this.exampleLayerGroup
+        'Example Layer': this.exampleLayerGroup,
+        'Real Arizona' : realAzLayer
       }).addTo(this.map);
     }, error => {
       l.control.layers({}, {States: statesLayer, 'Example Layer': this.exampleLayerGroup}).addTo(this.map);

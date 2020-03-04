@@ -38,7 +38,7 @@ export class MenuComponent {
           this.mapComponent.map.removeLayer(this.selectedPrecinct.layer);
           this.mapComponent.map.removeLayer(e.layer);
 
-          if (this.selectedPrecinct.error === 'GHOST') {
+          if (this.selectedPrecinct.error === 'GHOST' || e.error === 'GHOST') {
             this.errorListComponent.removeError(this.selectedPrecinct);
           }
 

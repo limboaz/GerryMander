@@ -94,11 +94,6 @@ export class PrecinctExample {
         n.layer.setStyle(highlightStyle);
       }
       this.highlighted = true;
-    } else {
-      for (const n of this.neighbors) {
-        n.layer.resetStyle();
-      }
-      this.highlighted = false;
     }
   }
 

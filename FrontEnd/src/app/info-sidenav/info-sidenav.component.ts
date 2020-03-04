@@ -1,8 +1,8 @@
 import {Component, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
 import {Demographic} from '../demographic.model';
-import {Presidential} from '../presidential.model';
 import {DialogButtonComponent} from '../dialog-button/dialog-button.component';
+import {ElectionData} from '../presidential.model';
 
 @Component({
   selector: 'app-info-sidenav',
@@ -14,11 +14,11 @@ export class InfoSidenavComponent implements OnInit {
   public sidenav: MatSidenav;
   @Input() demographicGroups = new Demographic();
   @Input() comment =  '';
-  @Input() presidentialGroups = new Presidential();
+  @Input() presidentialData: ElectionData;
+  public congressionalData = [];
 
   constructor() {
     this.demographicGroups.setData('undefined', 0 , 0 , 0 , 0 , 0 , 0 );
-    this.presidentialGroups.setData('undefined', 'undefined', 'undefined', 0);
   }
 
   ngOnInit(): void {

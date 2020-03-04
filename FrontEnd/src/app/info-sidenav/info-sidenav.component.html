@@ -11,11 +11,67 @@
           Presidential and Congressional Elections
         </mat-panel-description>
       </mat-expansion-panel-header>
-      <mat-list>
-        <mat-list-item>Candidate: {{presidentialGroups.candidate}}<app-dialog-button></app-dialog-button></mat-list-item>
-        <mat-list-item>Party: {{presidentialGroups.party}}<app-dialog-button></app-dialog-button></mat-list-item>
-        <mat-list-item>Total Vote: {{presidentialGroups.voteTotal}}<app-dialog-button></app-dialog-button></mat-list-item>
-      </mat-list>
+      <mat-accordion>
+        <mat-expansion-panel *ngIf="presidentialData">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Presidential Election
+            </mat-panel-title>
+            <mat-panel-description>
+              2016
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <mat-expansion-panel *ngFor="let candidate of presidentialData.candidates">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                {{candidate.party ? 'D' : 'R'}} {{candidate.name}}
+              </mat-panel-title>
+              <mat-panel-description>
+                Total Votes: {{candidate.voteTotal}}
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <div style="display: flex; flex-direction: column">
+              <mat-label>Early Votes: {{candidate.earlyVotes}}</mat-label>
+              <mat-label>Polling Place Votes: {{candidate.pollingPlaceVotes}}</mat-label>
+              <mat-label>Provisional Vote: {{candidate.provisionalVotes}}</mat-label>
+              <mat-label>Other Votes: {{candidate.otherVotes}}</mat-label>
+            </div>
+          </mat-expansion-panel>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Congressional Elections
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-accordion>
+            <mat-expansion-panel *ngFor="let congressionalElection of congressionalData">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  {{congressionalElection.year}}
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <mat-expansion-panel *ngFor="let candidate of congressionalElection.candidates">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    {{candidate.party ? 'D' : 'R'}} {{candidate.name}}
+                  </mat-panel-title>
+                  <mat-panel-description>
+                    Total Votes: {{candidate.voteTotal}}
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+                <div style="display: flex; flex-direction: column">
+                  <mat-label>Early Votes: {{candidate.earlyVotes}}</mat-label>
+                  <mat-label>Polling Place Votes: {{candidate.pollingPlaceVotes}}</mat-label>
+                  <mat-label>Provisional Vote: {{candidate.provisionalVotes}}</mat-label>
+                  <mat-label>Other Votes: {{candidate.otherVotes}}</mat-label>
+                </div>
+              </mat-expansion-panel>
+            </mat-expansion-panel>
+          </mat-accordion>
+        </mat-expansion-panel>
+      </mat-accordion>
     </mat-expansion-panel>
 
     <mat-expansion-panel>
