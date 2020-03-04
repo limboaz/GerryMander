@@ -6,6 +6,7 @@ export class Demographic {
   asian: number;
   hawaiian: number;
   others: number;
+  hispanic = 0;
   constructor() {
   }
   setData(uid, total, white, black, asian, hawaiian, others) {

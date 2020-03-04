@@ -16,6 +16,23 @@ export class InfoSidenavComponent implements OnInit {
   @Input() comment =  '';
   @Input() presidentialData: ElectionData;
   public congressionalData = [];
+  public labelMap = {
+    voteTotal: 'Total Votes',
+    pollingPlaceVotes: 'Polling Place Votes',
+    otherVotes: 'Other Votes',
+    earlyVotes: 'Early Votes'
+  };
+  public labelKeys = Object.keys(this.labelMap);
+  public demographicLabels = {
+    total: 'Total',
+    white: 'White',
+    black: 'Black or African American',
+    asian: 'Asian',
+    hawaiian: 'Native Hawaiian and Other Pacific Islander',
+    hispanic: 'Hispanic',
+    others: 'Others'
+  };
+  public demographicKeys = Object.keys(this.demographicLabels);
 
   constructor() {
     this.demographicGroups.setData('undefined', 0 , 0 , 0 , 0 , 0 , 0 );

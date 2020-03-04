@@ -13,7 +13,7 @@ export interface DialogData {
 })
 export class DialogButtonComponent implements OnInit {
   @Input() fieldName: string;
-  fieldValue: any;
+  @Input() fieldValue: any;
   @Output() valueChange = new EventEmitter();
   constructor(public dialog: MatDialog) { }
 
