@@ -1,6 +1,10 @@
 import pandas as pd
 import re
 
+def strip_quotes(str):
+	return str.strip("\"")
+
+
 #GEM key
 GEM_key = {
 "PrecinctID": 1,
@@ -27,34 +31,37 @@ index = 0
 for year in years:
 	#iterate through each county
 	for county in counties[index]:
-		filename = "../raw_data/Arizona/Coconino/2016_pres_results_county.txt"
+		filename = "../raw_data/Arizona/"+county+"/"+year+"_results_county.txt"
 		file = open(filename, 'r')
 		#parse GEMS slightly less nonsensical format
 		data = file.readlines()
 		for i in data:
+			# print(i)
 			row = re.split('''\,(?=(?:[^'"]|'[^']*'|"[^"]*")*$)''', i)
-			#add row to rows
-			rows.append({
-			"Year": year[0:4],
-			"County": county,
-			"PrecinctID": row[GEM_key["PrecinctID"]],
-			"PrecinctName": row[GEM_key["PrecinctName"]],
-			"ContestID": row[GEM_key["ContestID"]],
-			"ContestName": row[GEM_key["ContestName"]].lower(),
-			"ChoiceID": row[GEM_key["ChoiceID"]],
-			"ChoiceName": row[GEM_key["ChoiceName"]],
-			"PartyID": row[GEM_key["PartyID"]],
-			"CandidateParty": row[GEM_key["CandidateParty"]],
-			"VoteTypeID": row[GEM_key["VoteTypeID"]],
-			"VoteTypeName": row[GEM_key["VoteTypeName"]],
-			"VoteTotal": row[GEM_key["VoteTotal"]]
-			})
+			row = list(map(strip_quotes, row))
+			#check if vote type is VoteTotal and only candidate stats (not NP voteType)
+			# print(str(row[GEM_key["CandidateParty"]]))
+			# print("NP")
+			# exit(0)
+			if int(row[GEM_key["VoteTypeID"]]) == 999999 and row[GEM_key["CandidateParty"]] != "NP":
+				#add row to rows
+				rows.append({
+					"UID": str("AZ_"+re.sub(r" |_", "", county)+"_"+str(row[GEM_key["PrecinctName"]]).replace(" ", "")).upper(),
+					"State": "AZ",
+					"County": county,
+					"Precinct": row[GEM_key["PrecinctName"]],
+					"Year": year[0:4],
+					"Contest": row[GEM_key["ContestName"]].lower(),
+					"Party": row[GEM_key["CandidateParty"]],
+					"Candidate": row[GEM_key["ChoiceName"]],
+					"VoteTypeName": row[GEM_key["VoteTypeName"]],
+					"VoteTotal": row[GEM_key["VoteTotal"]]
+				})
 	index += 1
 #create dataframe
 df_AZ = pd.DataFrame(rows)
 #filter out non-Pres or House of Rep data
-df_AZ = df_AZ[df_AZ['ContestName'].str.contains('president') | df_AZ['ContestName'].str.contains('rep')]
-print(str(type(df_AZ)))
+df_AZ = df_AZ[df_AZ['Contest'].str.contains('president') | df_AZ['Contest'].str.contains('rep')]
 #save as csv file
-csv_file = '../preprocess/Arizona/election_data_GEMS.csv'
+csv_file = '../preprocess/Arizona/election_data_GEMS2.csv'
 df_AZ.to_csv(path_or_buf=csv_file, index=False)

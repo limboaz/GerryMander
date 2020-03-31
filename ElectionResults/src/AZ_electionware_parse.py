@@ -1,4 +1,5 @@
 import pandas as pd
+import re
 
 #extract boundaries for values in ElectionWare file
 def county_key_value(county_key, col):
@@ -36,7 +37,7 @@ for year in years:
         #rows = []
         for i in data:
             rows.append({
-                "UID": str("AZ_"+county+"_"+i[precinct_name_indices[0]:precinct_name_indices[1]].strip()).upper(),
+                "UID": str("AZ_"+re.sub(r" |_", "", county)+"_"+i[precinct_name_indices[0]:precinct_name_indices[1]].replace(" ", "")).upper(),
                 "State": "AZ",
                 "County": county,
                 "Precinct": i[precinct_name_indices[0]:precinct_name_indices[1]].strip(),
