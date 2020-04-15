@@ -1,0 +1,12 @@
+package edu.stonybrook.cs.GerryMander.Model.Enum;
+
+public enum ErrorType {
+    UNASSIGNED_AREA,
+    OVERLAPPING,
+    SELF_INTERSECTING,
+    ENCLOSED_PRECINCT,
+    MULTIPOLYGON,
+    ZERO_POPULATION,
+    ZERO_ELECTION_DATA,
+    VOTE_NOT_PROPORTIONAL_TO_POP
+}
