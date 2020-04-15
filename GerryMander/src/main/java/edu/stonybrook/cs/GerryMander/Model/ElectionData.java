@@ -3,27 +3,25 @@ package edu.stonybrook.cs.GerryMander.Model;
 import edu.stonybrook.cs.GerryMander.Model.Enum.CandidateParty;
 import edu.stonybrook.cs.GerryMander.Model.Enum.ElectionType;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 //TODO: add table name annotation
 public class ElectionData {
-    int id;
-    int year;
-    ElectionType type;
-    String candidate;
-    CandidateParty party;
-    int voteTotal;
+    private long id;
+    private int year;
+    private ElectionType type;
+    private String candidate;
+    private CandidateParty party;
+    private int voteTotal;
 
     @Id
     @GeneratedValue
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -35,6 +33,7 @@ public class ElectionData {
         this.year = year;
     }
 
+    @Enumerated(EnumType.ORDINAL)
     public ElectionType getType() {
         return type;
     }
@@ -51,6 +50,7 @@ public class ElectionData {
         this.candidate = candidate;
     }
 
+    @Enumerated(EnumType.ORDINAL)
     public CandidateParty getParty() {
         return party;
     }

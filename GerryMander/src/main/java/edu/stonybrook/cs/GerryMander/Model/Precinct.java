@@ -2,19 +2,120 @@ package edu.stonybrook.cs.GerryMander.Model;
 
 import edu.stonybrook.cs.GerryMander.Model.Enum.StatePostalCode;
 
+import javax.persistence.*;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
+@Entity
 public class Precinct {
-    String uid;
-    StatePostalCode state;
-    String county;
-    CongressionalDistrict congressionalDistrict;
-    String name;
-    List<Error> errors;
-    List<ElectionData> electionData;
-    PopulationData populationData;
-    String precinctGeoJSON;
-    Set<NeighborData> neighbors;
-    long totalPopulation;
+    private String uid;
+    private StatePostalCode state;
+    private String county;
+    private String name;
+    private List<Error> errors;
+    private List<ElectionData> electionData;
+    private PopulationData populationData;
+    private String precinctGeoJSON;
+    private NeighborData neighbors;
+    private long totalPopulation;
+
+    @Id
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    @Enumerated(EnumType.ORDINAL)
+    public StatePostalCode getState() {
+        return state;
+    }
+
+    public void setState(StatePostalCode state) {
+        this.state = state;
+    }
+
+    public String getCounty() {
+        return county;
+    }
+
+    public void setCounty(String county) {
+        this.county = county;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @OneToMany
+    public List<Error> getErrors() {
+        return errors;
+    }
+
+    public void setErrors(List<Error> errors) {
+        this.errors = errors;
+    }
+
+    @OneToMany
+    public List<ElectionData> getElectionData() {
+        return electionData;
+    }
+
+    public void setElectionData(List<ElectionData> electionData) {
+        this.electionData = electionData;
+    }
+
+    @OneToOne
+    public PopulationData getPopulationData() {
+        return populationData;
+    }
+
+    public void setPopulationData(PopulationData populationData) {
+        this.populationData = populationData;
+    }
+
+    public String getPrecinctGeoJSON() {
+        return precinctGeoJSON;
+    }
+
+    public void setPrecinctGeoJSON(String precinctGeoJSON) {
+        this.precinctGeoJSON = precinctGeoJSON;
+    }
+
+    @OneToOne
+    public NeighborData getNeighbors() {
+        return neighbors;
+    }
+
+    public void setNeighbors(NeighborData neighbors) {
+        this.neighbors = neighbors;
+    }
+
+    public long getTotalPopulation() {
+        return totalPopulation;
+    }
+
+    public void setTotalPopulation(long totalPopulation) {
+        this.totalPopulation = totalPopulation;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Precinct precinct = (Precinct) o;
+        return uid.equals(precinct.uid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uid);
+    }
 }

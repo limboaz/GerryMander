@@ -1,8 +1,20 @@
 package edu.stonybrook.cs.GerryMander.Model;
 
-import java.util.Set;
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
+import java.util.HashSet;
 
+@Entity
 public class BoundaryError extends Error {
-    String errorBoundaryGeoJSON;
-    Set<String> precinctsAssoicated;
+    private String errorBoundaryGeoJSON;
+
+
+    public String getErrorBoundaryGeoJSON() {
+        return errorBoundaryGeoJSON;
+    }
+
+    public void setErrorBoundaryGeoJSON(String errorBoundaryGeoJSON) {
+        this.errorBoundaryGeoJSON = errorBoundaryGeoJSON;
+    }
+
 }
