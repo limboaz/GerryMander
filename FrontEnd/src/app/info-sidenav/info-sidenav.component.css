@@ -1,0 +1,9 @@
+.sidenav .mat-toolbar {
+  position: absolute;
+  z-index: 1;
+}
+
+.sidenav {
+  width: 30%;
+}
+
