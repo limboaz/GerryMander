@@ -17,7 +17,7 @@ public class Precinct {
     private List<ElectionData> electionData;
     private PopulationData populationData;
     private String precinctGeoJSON;
-    private NeighborData neighbors;
+    private List<NeighborData> neighbors;
     private long totalPopulation;
 
     @Id
@@ -63,7 +63,7 @@ public class Precinct {
         this.errors = errors;
     }
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     public List<ElectionData> getElectionData() {
         return electionData;
     }
@@ -72,7 +72,7 @@ public class Precinct {
         this.electionData = electionData;
     }
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     public PopulationData getPopulationData() {
         return populationData;
     }
@@ -89,12 +89,12 @@ public class Precinct {
         this.precinctGeoJSON = precinctGeoJSON;
     }
 
-    @OneToOne
-    public NeighborData getNeighbors() {
+    @OneToMany(cascade = CascadeType.ALL)
+    public List<NeighborData> getNeighbors() {
         return neighbors;
     }
 
-    public void setNeighbors(NeighborData neighbors) {
+    public void setNeighbors(List<NeighborData> neighbors) {
         this.neighbors = neighbors;
     }
 

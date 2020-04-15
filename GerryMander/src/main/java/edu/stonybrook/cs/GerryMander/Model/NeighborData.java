@@ -8,7 +8,8 @@ import java.util.List;
 @Entity
 public class NeighborData {
     private long id;
-    private List<String> neighbors;
+    private String precinct1;
+    private String preicnct2;
 
     @Id
     @GeneratedValue
@@ -20,11 +21,19 @@ public class NeighborData {
         this.id = id;
     }
 
-    public List<String> getNeighbors() {
-        return neighbors;
+    public String getPrecinct1() {
+        return precinct1;
     }
 
-    public void setNeighbors(List<String> neighbors) {
-        this.neighbors = neighbors;
+    public void setPrecinct1(String precinct1) {
+        this.precinct1 = precinct1;
+    }
+
+    public String getPreicnct2() {
+        return preicnct2;
+    }
+
+    public void setPreicnct2(String preicnct2) {
+        this.preicnct2 = preicnct2;
     }
 }
