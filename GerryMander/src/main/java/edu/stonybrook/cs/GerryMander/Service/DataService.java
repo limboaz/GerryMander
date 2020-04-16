@@ -15,10 +15,6 @@ import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * Last edit: Yinuo
- * Date: April 15, 2020
- */
 
 @Service
 public class DataService {

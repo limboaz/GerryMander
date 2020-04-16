@@ -13,10 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-/*
- * Last edit: Mel
- * Date: April 16, 2020
- */
 
 @RestController
 @RequestMapping("/datacorrection")

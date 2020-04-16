@@ -10,10 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-/*
- * Last edit: Yinuo
- * Date: April 15, 2020
- */
 
 @RestController
 @RequestMapping("/boundarycorrection")
