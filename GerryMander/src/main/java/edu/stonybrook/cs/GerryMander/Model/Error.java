@@ -9,7 +9,7 @@ import java.util.Set;
 public abstract class Error {
     protected long id;
     protected ErrorType type;
-    protected String datasource;
+    protected String dataSource;
     protected Set<Precinct> precinctsAssociated;
 
     @Id
@@ -31,12 +31,12 @@ public abstract class Error {
         this.type = type;
     }
 
-    public String getDatasource() {
-        return datasource;
+    public String getDataSource() {
+        return dataSource;
     }
 
-    public void setDatasource(String datasource) {
-        this.datasource = datasource;
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
     }
 
     @OneToMany
