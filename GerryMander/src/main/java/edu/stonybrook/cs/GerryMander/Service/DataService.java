@@ -32,8 +32,8 @@ public class DataService {
      * NOTE: only dummy return values right now.
      */
 
-    public List<Precinct> getPrecinctsByCong(String congressional){
-        logger.info("getPrecinctsByCong: congressional = " + congressional);
+    public List<Precinct> getPrecinctsByCong(String congressionalID){
+        logger.info("getPrecinctsByCong: congressional = " + congressionalID);
 
         return new ArrayList<Precinct>();
     }

@@ -24,11 +24,11 @@ public class DataCorrectionService {
      * different exceptions.
      */
 
-    public void editElectionData(Integer errID, String uid, ElectionData electionData){
+    public void editElectionData(Long errID, String uid, ElectionData electionData){
         logger.info("editElectionData: errorID = " + errID + ", uid = " + uid);
     }
 
-    public void editPopulationData(Integer errID, String uid, PopulationData populationData){
+    public void editPopulationData(Long errID, String uid, PopulationData populationData){
         logger.info("editPopulationData: errID = " + errID + ", uid = " + uid);
     }
 

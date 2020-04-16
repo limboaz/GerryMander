@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 /*
- * Last edit: Yinuo
- * Date: April 15, 2020
+ * Last edit: Mel
+ * Date: April 16, 2020
  */
 
 @RestController
@@ -28,30 +28,25 @@ public class DataCorrectionController {
     private DataCorrectionService dataCorrectionService;
 
     @PostMapping("/editelectiondata")
-    public ResponseEntity<Object> editElectionData(@RequestParam Map<String, String> req){
+    public ResponseEntity<Object> editElectionData(@RequestBody ElectionData electionData, @RequestParam Map<String, String> req){
         HttpStatus status = HttpStatus.OK;
 
-        Integer errID = Integer.valueOf(req.get("errID"));
+        Long errID = Long.valueOf(req.get("errID"));
         String uid = req.get("uid");
 
-        /* TODO: write marshallers/unmarshallers to convert JSON to corresponding objects.
-            We can use Jackson 2, with its annotation.
-            Leaving this as dummy value for now, will complete later.
-         */
-
-        dataCorrectionService.editElectionData(errID, uid, new ElectionData());
+        dataCorrectionService.editElectionData(errID, uid, electionData);
 
         return new ResponseEntity<>(status);
     }
 
     @PostMapping("/editpopulationdata")
-    public ResponseEntity<Object> editPopulationData(@RequestParam Map<String, String> req){
+    public ResponseEntity<Object> editPopulationData(@RequestBody PopulationData populationData, @RequestParam Map<String, String> req){
         HttpStatus status = HttpStatus.OK;
 
-        Integer errID = Integer.valueOf(req.get("errID"));
+        Long errID = Long.valueOf(req.get("errID"));
         String uid = req.get("uid");
 
-        dataCorrectionService.editPopulationData(errID, uid, new PopulationData());
+        dataCorrectionService.editPopulationData(errID, uid, populationData);
 
         return new ResponseEntity<>(status);
     }
