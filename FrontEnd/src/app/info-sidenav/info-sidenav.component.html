@@ -24,7 +24,7 @@
           <mat-expansion-panel *ngFor="let candidate of presidentialData.candidates">
             <mat-expansion-panel-header>
               <mat-panel-title>
-                {{candidate.party ? 'D' : 'R'}} {{candidate.name}}
+                {{candidate.party ? 'R' : 'D'}} {{candidate.name}}
               </mat-panel-title>
               <mat-panel-description>
                 Total Votes: {{candidate.voteTotal}}
@@ -57,7 +57,7 @@
               <mat-expansion-panel *ngFor="let candidate of congressionalElection.candidates">
                 <mat-expansion-panel-header>
                   <mat-panel-title>
-                    {{candidate.party ? 'D' : 'R'}} {{candidate.name}}
+                    {{candidate.party ? 'R' : 'D'}} {{candidate.name}}
                   </mat-panel-title>
                   <mat-panel-description>
                     Total Votes: {{candidate.voteTotal}}
