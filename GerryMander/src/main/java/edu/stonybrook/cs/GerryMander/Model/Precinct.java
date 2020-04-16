@@ -5,12 +5,12 @@ import edu.stonybrook.cs.GerryMander.Model.Enum.StatePostalCode;
 import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 public class Precinct {
     private String uid;
     private StatePostalCode state;
+    private int congDistrictNum;
     private String county;
     private String name;
     private List<Error> errors;
@@ -19,6 +19,14 @@ public class Precinct {
     private String precinctGeoJSON;
     private List<NeighborData> neighbors;
     private long totalPopulation;
+
+    public Precinct(){
+
+    }
+
+    public Precinct(String uid){
+        this.uid = uid;
+    }
 
     @Id
     public String getUid() {
@@ -36,6 +44,14 @@ public class Precinct {
 
     public void setState(StatePostalCode state) {
         this.state = state;
+    }
+
+    public int getCongDistrictNum() {
+        return congDistrictNum;
+    }
+
+    public void setCongDistrictNum(int congDistrictNum) {
+        this.congDistrictNum = congDistrictNum;
     }
 
     public String getCounty() {

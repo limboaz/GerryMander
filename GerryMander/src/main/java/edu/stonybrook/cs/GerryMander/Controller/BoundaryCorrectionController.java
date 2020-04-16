@@ -28,7 +28,7 @@ public class BoundaryCorrectionController {
     public ResponseEntity<String> mergePrecincts(@RequestBody Map<String, String> req){
         HttpStatus status = HttpStatus.OK;
 
-        Integer errID = Integer.valueOf(req.get("errID"));
+        Long errID = Long.valueOf(req.get("errID"));
         String precinctA = req.get("precinctA");
         String precinctB = req.get("precinctB");
 
@@ -44,7 +44,7 @@ public class BoundaryCorrectionController {
     public ResponseEntity<Object> updatePrecinctBoundary(@RequestBody Map<String, String> req){
         HttpStatus status = HttpStatus.OK;
 
-        Integer errID = Integer.valueOf(req.get("errID"));
+        Long errID = Long.valueOf(req.get("errID"));
         String uid = req.get("uid");
         String newBoundary = req.get("newBoundary");
 
@@ -57,10 +57,11 @@ public class BoundaryCorrectionController {
     public ResponseEntity<String> defineGhostPrecinct(@RequestBody Map<String, String> req){
         HttpStatus status = HttpStatus.OK;
 
-        Integer errID = Integer.valueOf(req.get("errID"));
+        Long errID = Long.valueOf(req.get("errID"));
         String boundary = req.get("boundary");
+        String precinctID = req.get("uid");
 
-        String result = boundaryCorrectionService.defineGhostPrecinct(errID, boundary);
+        String result = boundaryCorrectionService.defineGhostPrecinct(errID, boundary, precinctID);
         if(result == null){
             status = HttpStatus.INTERNAL_SERVER_ERROR;
             logger.error("defineGhostPrecinct: return value is null. ");

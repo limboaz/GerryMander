@@ -66,4 +66,16 @@ public class ElectionData {
     public void setVoteTotal(int voteTotal) {
         this.voteTotal = voteTotal;
     }
+
+    @Override
+    public String toString() {
+        return "ElectionData{" +
+                "id=" + id +
+                ", year=" + year +
+                ", type=" + type +
+                ", candidate='" + candidate + '\'' +
+                ", party=" + party +
+                ", voteTotal=" + voteTotal +
+                '}';
+    }
 }

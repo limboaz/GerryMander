@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /*
- * Last edit: Yinuo
- * Date: April 15, 2020
+ * Last edit: Mel
+ * Date: April 16, 2020
  */
 
 @RestController
@@ -31,9 +31,9 @@ public class DataController {
     private DataService dataService;
 
     @GetMapping("/getprecinctsbycong")
-    public ResponseEntity<List<Precinct>> getPrecinctsByCong(@RequestParam String congressional){
+    public ResponseEntity<List<Precinct>> getPrecinctsByCong(@RequestParam String congressionalID){
         HttpStatus status = HttpStatus.OK;
-        List<Precinct> result = dataService.getPrecinctsByCong(congressional);
+        List<Precinct> result = dataService.getPrecinctsByCong(congressionalID);
         if (result.size() < 1){
             status = HttpStatus.INTERNAL_SERVER_ERROR;
             logger.error("getPrecinctsByCong: result size is 0.");
