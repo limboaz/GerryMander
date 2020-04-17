@@ -54,7 +54,6 @@ for year in years:
 					"Contest": row[GEM_key["ContestName"]].lower(),
 					"Party": row[GEM_key["CandidateParty"]],
 					"Candidate": row[GEM_key["ChoiceName"]],
-					"VoteTypeName": row[GEM_key["VoteTypeName"]],
 					"VoteTotal": row[GEM_key["VoteTotal"]]
 				})
 	index += 1
@@ -63,5 +62,5 @@ df_AZ = pd.DataFrame(rows)
 #filter out non-Pres or House of Rep data
 df_AZ = df_AZ[df_AZ['Contest'].str.contains('president') | df_AZ['Contest'].str.contains('rep')]
 #save as csv file
-csv_file = '../preprocess/Arizona/election_data_GEMS2.csv'
+csv_file = '../preprocess/Arizona/election_data_GEMS.csv'
 df_AZ.to_csv(path_or_buf=csv_file, index=False)

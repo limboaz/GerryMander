@@ -52,5 +52,5 @@ for year in years:
 df_AZ = df_AZ.append(rows, sort=False)
 #filter out non presidential or US House data
 df_AZ = df_AZ[df_AZ['Contest'].str.contains('PRESIDENTIAL ELECTORS') | df_AZ['Contest'].str.contains('REP')]
-csv_file = '../preprocess/Arizona/election_data_EW2.csv'
+csv_file = '../preprocess/Arizona/election_data_EW.csv'
 df_AZ.to_csv(path_or_buf=csv_file, index=False)
