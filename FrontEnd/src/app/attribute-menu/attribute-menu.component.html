@@ -2,42 +2,6 @@
   <mat-expansion-panel>
     <mat-expansion-panel-header>
       <mat-panel-title>
-        Election Data
-      </mat-panel-title>
-      <mat-panel-description>
-        Show data for Presidential and Congressional Elections
-      </mat-panel-description>
-    </mat-expansion-panel-header>
-    <mat-radio-group class="election-radio-group">
-      <mat-radio-button class="election-radio-button" value="1">2016 Presidential Election</mat-radio-button>
-      <mat-radio-button class="election-radio-button" value="2">2016 Congressional Election</mat-radio-button>
-      <mat-radio-button class="election-radio-button" value="3">2018 Congressional Election</mat-radio-button>
-    </mat-radio-group>
-    <mat-radio-group>
-      <mat-radio-button class="election-radio-button" value="1">Democratic Party</mat-radio-button>
-      <mat-radio-button class="election-radio-button" value="2">Republican Party</mat-radio-button>
-    </mat-radio-group>
-  </mat-expansion-panel>
-
-  <mat-expansion-panel>
-    <mat-expansion-panel-header>
-      <mat-panel-title>
-        Demographic Data
-      </mat-panel-title>
-      <mat-panel-description>
-        Show demographic data
-      </mat-panel-description>
-    </mat-expansion-panel-header>
-    <mat-selection-list>
-      <mat-list-option *ngFor="let group of demographicGroups">
-        {{group}}
-      </mat-list-option>
-    </mat-selection-list>
-  </mat-expansion-panel>
-
-  <mat-expansion-panel>
-    <mat-expansion-panel-header>
-      <mat-panel-title>
         Data Source
       </mat-panel-title>
       <mat-panel-description>
@@ -50,15 +14,30 @@
       </mat-expansion-panel-header>
       <mat-list>
         <mat-list-item>Ohio</mat-list-item>
-        <mat-list-item><a href = "https://www.sos.state.oh.us/globalassets/elections/2016/gen/precinct.xlsx"><button mat-button>Congressional/Presidential election 2016</button></a></mat-list-item>
-        <mat-list-item><a href = "https://www.sos.state.oh.us/globalassets/elections/2018/gen/2018-11-06_statewideprecinct_miami.xlsx"><button mat-button>Congressional election 2018</button></a></mat-list-item>
+        <mat-list-item><a href="https://www.sos.state.oh.us/globalassets/elections/2016/gen/precinct.xlsx">
+          <button mat-button>Congressional/Presidential election 2016</button>
+        </a></mat-list-item>
+        <mat-list-item><a
+          href="https://www.sos.state.oh.us/globalassets/elections/2018/gen/2018-11-06_statewideprecinct_miami.xlsx">
+          <button mat-button>Congressional election 2018</button>
+        </a></mat-list-item>
         <mat-list-item>Arizona</mat-list-item>
-        <mat-list-item><a href = "https://apps.azsos.gov/results/2016/General/"><button mat-button>Congressional/Presidential election 2016</button></a></mat-list-item>
-        <mat-list-item><a href = "https://azsos.gov/precinct-level-results-county-2018-general-election"><button mat-button>Congressional Election 2018</button></a></mat-list-item>
+        <mat-list-item><a href="https://apps.azsos.gov/results/2016/General/">
+          <button mat-button>Congressional/Presidential election 2016</button>
+        </a></mat-list-item>
+        <mat-list-item><a href="https://azsos.gov/precinct-level-results-county-2018-general-election">
+          <button mat-button>Congressional Election 2018</button>
+        </a></mat-list-item>
         <mat-list-item>Wisconsin</mat-list-item>
-        <mat-list-item><a href = "https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/PSKDUJ"><button mat-button>Congressional 2016</button></a></mat-list-item>
-        <mat-list-item><a href = "https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/LYWX3D"><button mat-button>Presidential 2016</button></a></mat-list-item>
-        <mat-list-item><a href = "https://github.com/MEDSL/2018-elections-official/blob/master/precinct_2018.zip"><button mat-button>Congressional 2018</button></a></mat-list-item>
+        <mat-list-item><a href="https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/PSKDUJ">
+          <button mat-button>Congressional 2016</button>
+        </a></mat-list-item>
+        <mat-list-item><a href="https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/LYWX3D">
+          <button mat-button>Presidential 2016</button>
+        </a></mat-list-item>
+        <mat-list-item><a href="https://github.com/MEDSL/2018-elections-official/blob/master/precinct_2018.zip">
+          <button mat-button>Congressional 2018</button>
+        </a></mat-list-item>
       </mat-list>
     </mat-expansion-panel>
     <mat-expansion-panel>
@@ -66,12 +45,17 @@
         Census Data
       </mat-expansion-panel-header>
       <mat-list>
-        <mat-list-item><a href = "https://www2.census.gov/geo/tiger/TIGER2010BLKPOPHU/"><button mat-button>Census Block Geography</button></a></mat-list-item>
-        <mat-list-item><a href = "https://factfinder.census.gov/faces/affhelp/jsf/pages/metadata.xhtml?lang=en&type=table&id=table.en.DEC_10_DP_DPDP1#main_content"><button mat-button>Demographic Data</button></a></mat-list-item>
-<!--        <mat-list-item><a><button mat-button></button></a></mat-list-item>-->
-<!--        <mat-list-item><a><button mat-button></button></a></mat-list-item>-->
-<!--        <mat-list-item><a><button mat-button></button></a></mat-list-item>-->
-<!--        <mat-list-item><a><button mat-button></button></a></mat-list-item>-->
+        <mat-list-item><a href="https://www2.census.gov/geo/tiger/TIGER2010BLKPOPHU/">
+          <button mat-button>Census Block Geography</button>
+        </a></mat-list-item>
+        <mat-list-item><a
+          href="https://factfinder.census.gov/faces/affhelp/jsf/pages/metadata.xhtml?lang=en&type=table&id=table.en.DEC_10_DP_DPDP1#main_content">
+          <button mat-button>Demographic Data</button>
+        </a></mat-list-item>
+        <!--        <mat-list-item><a><button mat-button></button></a></mat-list-item>-->
+        <!--        <mat-list-item><a><button mat-button></button></a></mat-list-item>-->
+        <!--        <mat-list-item><a><button mat-button></button></a></mat-list-item>-->
+        <!--        <mat-list-item><a><button mat-button></button></a></mat-list-item>-->
       </mat-list>
     </mat-expansion-panel>
   </mat-expansion-panel>

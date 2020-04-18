@@ -21,55 +21,51 @@
               2016
             </mat-panel-description>
           </mat-expansion-panel-header>
-          <mat-expansion-panel *ngFor="let candidate of presidentialData.candidates">
+          <mat-expansion-panel *ngFor="let candidate of presidentialData">
             <mat-expansion-panel-header>
               <mat-panel-title>
-                {{candidate.party ? 'R' : 'D'}} {{candidate.name}}
+                {{candidate.party}} {{candidate.candidate}}
               </mat-panel-title>
               <mat-panel-description>
                 Total Votes: {{candidate.voteTotal}}
               </mat-panel-description>
             </mat-expansion-panel-header>
             <div style="display: flex; flex-direction: column">
-              <div *ngFor="let key of labelKeys">
-                <mat-label>{{labelMap[key]}}: {{candidate[key]}}</mat-label>
-                <app-dialog-button [fieldValue]="candidate[key]" [fieldName]="labelMap[key]"
-                                   (valueChange)="candidate[key] = $event">
+                <mat-label>Total Votes: {{candidate.voteTotal}}</mat-label>
+                <app-dialog-button [fieldValue]="candidate.voteTotal" [fieldName]='"Total Votes"'
+                                   (valueChange)="candidate.voteTotal = $event">
                 </app-dialog-button>
               </div>
-            </div>
           </mat-expansion-panel>
         </mat-expansion-panel>
 
-        <mat-expansion-panel>
+        <mat-expansion-panel *ngIf="congressionalData">
           <mat-expansion-panel-header>
             <mat-panel-title>
               Congressional Elections
             </mat-panel-title>
           </mat-expansion-panel-header>
           <mat-accordion>
-            <mat-expansion-panel *ngFor="let congressionalElection of congressionalData">
+            <mat-expansion-panel *ngFor="let year of [2016, 2018]">
               <mat-expansion-panel-header>
                 <mat-panel-title>
-                  {{congressionalElection.year}}
+                  {{year}}
                 </mat-panel-title>
               </mat-expansion-panel-header>
-              <mat-expansion-panel *ngFor="let candidate of congressionalElection.candidates">
+              <mat-expansion-panel *ngFor="let candidate of congressionalData[year]">
                 <mat-expansion-panel-header>
                   <mat-panel-title>
-                    {{candidate.party ? 'R' : 'D'}} {{candidate.name}}
+                    {{candidate.party}} {{candidate.candidate}}
                   </mat-panel-title>
                   <mat-panel-description>
                     Total Votes: {{candidate.voteTotal}}
                   </mat-panel-description>
                 </mat-expansion-panel-header>
                 <div style="display: flex; flex-direction: column">
-                  <div *ngFor="let key of labelKeys">
-                    <mat-label>{{labelMap[key]}}: {{candidate[key]}}</mat-label>
-                    <app-dialog-button [fieldValue]="candidate[key]" [fieldName]="labelMap[key]"
-                                       (valueChange)="candidate[key] = $event">
-                    </app-dialog-button>
-                  </div>
+                  <mat-label>Total Votes: {{candidate.voteTotal}}</mat-label>
+                  <app-dialog-button [fieldValue]="candidate.voteTotal" [fieldName]='"Total Votes"'
+                                     (valueChange)="candidate.voteTotal = $event">
+                  </app-dialog-button>
                 </div>
               </mat-expansion-panel>
             </mat-expansion-panel>
@@ -78,37 +74,22 @@
       </mat-accordion>
     </mat-expansion-panel>
 
-    <mat-expansion-panel>
+    <mat-expansion-panel *ngIf="populationData">
       <mat-expansion-panel-header>
         <mat-panel-title>
-          Demographic Data
+          Population Data
         </mat-panel-title>
         <mat-panel-description>
-          Show demographic data
+          Show population data
         </mat-panel-description>
       </mat-expansion-panel-header>
       <mat-list>
-        <mat-list-item *ngFor="let key of demographicKeys">
-          <mat-label>{{demographicLabels[key]}}: {{demographicGroups[key]}}</mat-label>
-          <app-dialog-button [fieldValue]="demographicGroups[key]" [fieldName]="demographicLabels[key]"
-                             (valueChange)="demographicGroups[key] = $event">
+        <mat-list-item *ngFor="let key of populationKeys">
+          <mat-label>{{populationLabels[key]}}: {{populationData[key]}}</mat-label>
+          <app-dialog-button [fieldValue]="populationData[key]" [fieldName]="populationLabels[key]"
+                             (valueChange)="populationData[key] = $event">
           </app-dialog-button>
         </mat-list-item>
-      </mat-list>
-    </mat-expansion-panel>
-
-    <mat-expansion-panel>
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          Comment
-        </mat-panel-title>
-        <mat-panel-description>
-          Comment on this precinct
-        </mat-panel-description>
-      </mat-expansion-panel-header>
-      <mat-list>
-        <mat-list-item>{{comment}}</mat-list-item>
-        <mat-list-item><app-dialog-button [fieldName]="'comment'" [fieldValue]="comment" (valueChange)="comment = $event"></app-dialog-button></mat-list-item>
       </mat-list>
     </mat-expansion-panel>
   </mat-accordion>

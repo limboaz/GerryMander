@@ -3,7 +3,6 @@ import {NgModule} from '@angular/core';
 
 import {AppComponent} from './app.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {MenuComponent} from './menu/menu.component';
 import {LayoutModule} from '@angular/cdk/layout';
 import {MapComponent} from './map/map.component';
 import {HttpClientModule} from '@angular/common/http';
@@ -19,7 +18,6 @@ import {FormsModule} from '@angular/forms';
 @NgModule({
   declarations: [
     AppComponent,
-    MenuComponent,
     MapComponent,
     AttributeMenuComponent,
     InfoSidenavComponent,
