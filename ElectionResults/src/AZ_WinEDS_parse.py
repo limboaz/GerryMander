@@ -1,21 +1,27 @@
 import pandas as pd
 
-party = ["NA", "REP", "DEM", "LBT", "GRN", "IND", ""]
+party = ["NA", "REP", "DEM", "LIB", "GRN", "IND", ""]
 
 #create csv file for WinEDS type formatting
 def cleanWinEDS(file, year, county):
     #read dataframe for needed col
     df_AZ = pd.read_csv(file, sep="\t", encoding="latin-1", usecols=["PRECINCT_NAME", "CONTEST_FULL_NAME", "candidate_party_id", "CANDIDATE_FULL_NAME", "TOTAL"])
+    df_AZ = df_AZ.rename(columns={"PRECINCT_NAME": "Precinct", "CANDIDATE_FULL_NAME": "Candidate", "candidate_party_id": "Party", "CONTEST_FULL_NAME": "Contest", "TOTAL": "VoteTotal"})
     #filter to just PRES and CON
-    df_AZ = df_AZ[df_AZ['CONTEST_FULL_NAME'].str.contains('Presidential Electors') | df_AZ['CONTEST_FULL_NAME'].str.contains('US Senate') | df_AZ['CONTEST_FULL_NAME'].str.contains('Rep')]
+    df_AZ = df_AZ[df_AZ['Contest'].str.contains('Presidential Electors') | df_AZ['Contest'].str.contains('US Rep Dst')]
     #map party_id to party
-    df_AZ["candidate_party_id"] = df_AZ["candidate_party_id"].apply(lambda x: party[int(x)])
+    df_AZ["Party"] = df_AZ["Party"].apply(lambda x: party[int(x)])
+    #remove write in rows
+    p = ["DEM", "REP", "LIB", "GRN", "IND"]
+    df_AZ = df_AZ[df_AZ['Party'].isin(p)]
+    #map contest to contesttpye
+    df_AZ['Contest'] = df_AZ['Contest'].map(lambda x : "PRES" if x == 'Presidential Electors' else "CON")
     #trim precinct name to remove precinct_num
-    df_AZ["PRECINCT_NAME"] = df_AZ["PRECINCT_NAME"].apply(lambda x: x[5:])
+    df_AZ["Precinct"] = df_AZ["Precinct"].apply(lambda x: x[5:])
     #set uid
     df_AZ["UID"] = ""
     for i in df_AZ.index:
-        df_AZ["UID"][i] = "AZ_"+str(county).upper()+"_"+df_AZ["PRECINCT_NAME"][i].replace(" ", "").upper()
+        df_AZ.at[i, "UID"] = "AZ_"+str(county).upper()+"_"+df_AZ["Precinct"][i].replace(" ", "").upper()
     #set year
     df_AZ["Year"] = year
     #set county

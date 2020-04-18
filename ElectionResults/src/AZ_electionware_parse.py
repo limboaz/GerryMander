@@ -43,7 +43,7 @@ for year in years:
                 "Precinct": i[precinct_name_indices[0]:precinct_name_indices[1]].strip(),
                 "Year": str(year[0:4]),
                 "Contest": i[111:167].strip().upper(),
-                "Party": i[101:104].strip(),
+                "Party": "LIB" if i[101:104].strip() == "LBT" else i[101:104].strip(),
                 "Candidate": i[167:205].strip(),
                 "VoteTotal": int(i[11:17])
             })
@@ -51,6 +51,11 @@ for year in years:
     file.close()
 df_AZ = df_AZ.append(rows, sort=False)
 #filter out non presidential or US House data
-df_AZ = df_AZ[df_AZ['Contest'].str.contains('PRESIDENTIAL ELECTORS') | df_AZ['Contest'].str.contains('REP')]
-csv_file = '../preprocess/Arizona/election_data_EW.csv'
+df_AZ = df_AZ[df_AZ['Contest'].str.contains('PRESIDENTIAL ELECTORS') | df_AZ['Contest'].str.contains('U.S. REP')]
+df_AZ['Contest'] = df_AZ['Contest'].map(lambda x : "PRES" if x == 'PRESIDENTIAL ELECTORS' else "CON")
+#remove write in rows
+p = ["DEM", "REP", "LIB", "GRN", "IND"]
+df_AZ = df_AZ[df_AZ['Party'].isin(p)]
+
+csv_file = '../preprocess/Arizona/election_data_EW2.csv'
 df_AZ.to_csv(path_or_buf=csv_file, index=False)

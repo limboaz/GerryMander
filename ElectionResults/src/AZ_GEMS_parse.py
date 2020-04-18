@@ -36,12 +36,9 @@ for year in years:
 		#parse GEMS slightly less nonsensical format
 		data = file.readlines()
 		for i in data:
-			# print(i)
 			row = re.split('''\,(?=(?:[^'"]|'[^']*'|"[^"]*")*$)''', i)
 			row = list(map(strip_quotes, row))
 			#check if vote type is VoteTotal and only candidate stats (not NP voteType)
-			# print(str(row[GEM_key["CandidateParty"]]))
-			# print("NP")
 			# exit(0)
 			if int(row[GEM_key["VoteTypeID"]]) == 999999 and row[GEM_key["CandidateParty"]] != "NP":
 				#add row to rows
@@ -52,7 +49,7 @@ for year in years:
 					"Precinct": row[GEM_key["PrecinctName"]],
 					"Year": year[0:4],
 					"Contest": row[GEM_key["ContestName"]].lower(),
-					"Party": row[GEM_key["CandidateParty"]],
+					"Party": "LIB" if row[GEM_key["CandidateParty"]] == "LBT" else row[GEM_key["CandidateParty"]],
 					"Candidate": row[GEM_key["ChoiceName"]],
 					"VoteTotal": row[GEM_key["VoteTotal"]]
 				})
@@ -60,7 +57,8 @@ for year in years:
 #create dataframe
 df_AZ = pd.DataFrame(rows)
 #filter out non-Pres or House of Rep data
-df_AZ = df_AZ[df_AZ['Contest'].str.contains('president') | df_AZ['Contest'].str.contains('rep')]
+df_AZ = df_AZ[df_AZ['Contest'].str.contains('president') | df_AZ['Contest'].str.contains('u.s. rep')]
+df_AZ['Contest'] = df_AZ['Contest'].map(lambda x : "PRES" if x == 'u.s. president' else "CON")
 #save as csv file
-csv_file = '../preprocess/Arizona/election_data_GEMS.csv'
+csv_file = '../preprocess/Arizona/election_data_GEMS2.csv'
 df_AZ.to_csv(path_or_buf=csv_file, index=False)

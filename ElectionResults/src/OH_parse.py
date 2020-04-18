@@ -11,8 +11,8 @@ def clean(file, year, type_elect, senate_bdy):
     # iterate though precincts
     for i in df_OH.index:
         # iterate through candidates
-        # index in cols where candidates start: 8
-        for can_i in range(8,len(cols)):
+        # index in cols where candidates start: senate_bdy
+        for can_i in range(senate_bdy,len(cols)):
             candidate = cols[can_i]
             if "(" in candidate:
                 bdy = candidate.index("(")
@@ -29,7 +29,7 @@ def clean(file, year, type_elect, senate_bdy):
                     "County": df_OH.at[i, 'County Name'],
                     "Precinct": df_OH.at[i, "Precinct Name"],
                     "Year": year,
-                    "Contest": "PRES" if type_elect is "PRES" else ("SENATE" if can_i < senate_bdy else "HOUSE"),
+                    "Contest": "PRES" if type_elect is "PRES" else "CON",
                     "Party": party,
                     "Candidate": candidate,
                     "VoteTotal": voteTotal
@@ -39,7 +39,7 @@ def clean(file, year, type_elect, senate_bdy):
 
 
 file = r"C:\Users\mlo10\IdeaProjects\GerryMander\ElectionResults\raw_data\Ohio\2016_pres_results_precinct.csv"
-dfP2016 = clean(file, 2016, "PRES", 0)
+dfP2016 = clean(file, 2016, "PRES", 8)
 
 file = r"C:\Users\mlo10\IdeaProjects\GerryMander\ElectionResults\raw_data\Ohio\2016_con_results_precinct.csv"
 dfC2016 = clean(file, 2016, "CON", 15)
