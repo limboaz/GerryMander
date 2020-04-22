@@ -19,8 +19,8 @@ import java.util.List;
 @Service
 public class DataService {
 
-//    @PersistenceContext
-//    private EntityManager em;
+    @PersistenceContext
+    private EntityManager em;
 
     private static Logger logger = LoggerFactory.getLogger(DataService.class);
 
