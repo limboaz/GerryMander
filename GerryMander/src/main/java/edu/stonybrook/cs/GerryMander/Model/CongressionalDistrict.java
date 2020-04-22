@@ -6,15 +6,18 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
+@Table(name = "congressional_district")
 public class CongressionalDistrict {
     private long id;
     private int districtNum;
-    private StatePostalCode state;
+    private StatePostalCode stateCode;
     private List<Precinct> precincts;
     private String congressionalDistrictGeoJSON;
+    private State state;
 
     @Id
     @GeneratedValue
+    @Column(name = "id")
     public long getId() {
         return id;
     }
@@ -31,16 +34,25 @@ public class CongressionalDistrict {
         this.districtNum = districtNum;
     }
 
-    @Enumerated(EnumType.ORDINAL)
-    public StatePostalCode getState() {
+    @Enumerated
+    public StatePostalCode getStateCode() {
+        return stateCode;
+    }
+
+    public void setStateCode(StatePostalCode stateCode) {
+        this.stateCode = stateCode;
+    }
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    public State getState() {
         return state;
     }
 
-    public void setState(StatePostalCode state) {
+    public void setState(State state) {
         this.state = state;
     }
 
-    @OneToMany
+    @OneToMany(mappedBy = "congressionalDistrict", cascade = CascadeType.ALL)
     public List<Precinct> getPrecincts() {
         return precincts;
     }
@@ -49,6 +61,7 @@ public class CongressionalDistrict {
         this.precincts = precincts;
     }
 
+    @Lob
     public String getCongressionalDistrictGeoJSON() {
         return congressionalDistrictGeoJSON;
     }

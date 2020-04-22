@@ -1,15 +1,15 @@
 package edu.stonybrook.cs.GerryMander.Model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
+@Table(name = "NeighborData")
 public class NeighborData {
     private long id;
     private String precinct1;
-    private String preicnct2;
+    private String precinct2;
+    private Precinct precinct;
 
     @Id
     @GeneratedValue
@@ -29,11 +29,20 @@ public class NeighborData {
         this.precinct1 = precinct1;
     }
 
-    public String getPreicnct2() {
-        return preicnct2;
+    public String getPrecinct2() {
+        return precinct2;
     }
 
-    public void setPreicnct2(String preicnct2) {
-        this.preicnct2 = preicnct2;
+    public void setPrecinct2(String precinct2) {
+        this.precinct2 = precinct2;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    public Precinct getPrecinct() {
+        return precinct;
+    }
+
+    public void setPrecinct(Precinct precinct) {
+        this.precinct = precinct;
     }
 }

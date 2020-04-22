@@ -43,7 +43,7 @@ public class DataService {
     public State getState(StatePostalCode state){
         logger.info("getState: state = " + state.name());
 
-        return new State();
+        return em.find(State.class, state);
     }
 
     public List<Error> getErrors(StatePostalCode state){

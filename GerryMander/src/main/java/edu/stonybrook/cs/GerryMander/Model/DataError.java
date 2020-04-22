@@ -1,9 +1,11 @@
 package edu.stonybrook.cs.GerryMander.Model;
 
 import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.Set;
 
 @Entity
+@Table(name = "DataError")
 public class DataError extends Error{
     private float errorValue;
 

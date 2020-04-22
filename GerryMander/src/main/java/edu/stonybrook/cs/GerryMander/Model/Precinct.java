@@ -7,10 +7,12 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
+@Table(name = "precinct")
 public class Precinct {
     private String uid;
     private StatePostalCode state;
     private int congDistrictNum;
+    private CongressionalDistrict congressionalDistrict;
     private String county;
     private String name;
     private List<Error> errors;
@@ -29,12 +31,22 @@ public class Precinct {
     }
 
     @Id
+    @Column(name = "uid", length = 100)
     public String getUid() {
         return uid;
     }
 
     public void setUid(String uid) {
         this.uid = uid;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    public CongressionalDistrict getCongressionalDistrict() {
+        return congressionalDistrict;
+    }
+
+    public void setCongressionalDistrict(CongressionalDistrict congressionalDistrict) {
+        this.congressionalDistrict = congressionalDistrict;
     }
 
     @Enumerated(EnumType.ORDINAL)
@@ -70,7 +82,7 @@ public class Precinct {
         this.name = name;
     }
 
-    @OneToMany
+    @OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL)
     public List<Error> getErrors() {
         return errors;
     }
@@ -79,7 +91,7 @@ public class Precinct {
         this.errors = errors;
     }
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL)
     public List<ElectionData> getElectionData() {
         return electionData;
     }
@@ -88,7 +100,7 @@ public class Precinct {
         this.electionData = electionData;
     }
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "precinct", cascade = CascadeType.ALL)
     public PopulationData getPopulationData() {
         return populationData;
     }
@@ -97,6 +109,7 @@ public class Precinct {
         this.populationData = populationData;
     }
 
+    @Lob
     public String getPrecinctGeoJSON() {
         return precinctGeoJSON;
     }
@@ -105,7 +118,7 @@ public class Precinct {
         this.precinctGeoJSON = precinctGeoJSON;
     }
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL)
     public List<NeighborData> getNeighbors() {
         return neighbors;
     }

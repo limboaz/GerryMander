@@ -2,19 +2,23 @@ package edu.stonybrook.cs.GerryMander.Model;
 
 import edu.stonybrook.cs.GerryMander.Model.Enum.StatePostalCode;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.OneToMany;
-import javax.persistence.Transient;
+import javax.persistence.*;
+import javax.websocket.ClientEndpoint;
 import java.util.List;
 import java.util.Set;
 
+@Entity
 public class State {
+
     private StatePostalCode state;
+
     private List<CongressionalDistrict> congressionalDistricts;
+
     private Set<Error> errors;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Id
+    @Enumerated
+    @Column(name = "id")
     public StatePostalCode getState() {
         return state;
     }
@@ -23,6 +27,8 @@ public class State {
         this.state = state;
     }
 
+    @OneToMany(mappedBy = "state", cascade = CascadeType.ALL)
+    @Column
     public List<CongressionalDistrict> getCongressionalDistricts() {
         return congressionalDistricts;
     }
@@ -31,6 +37,8 @@ public class State {
         this.congressionalDistricts = congressionalDistricts;
     }
 
+    @OneToMany(mappedBy = "state")
+    @Column
     public Set<Error> getErrors() {
         return errors;
     }

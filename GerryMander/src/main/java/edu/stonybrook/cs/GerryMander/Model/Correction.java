@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
+@Table(name = "correction")
 public class Correction {
     private long id;
     private CorrectionType type;
@@ -66,7 +67,7 @@ public class Correction {
         this.newValue = newValue;
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     public Error getAssociatedError() {
         return associatedError;
     }

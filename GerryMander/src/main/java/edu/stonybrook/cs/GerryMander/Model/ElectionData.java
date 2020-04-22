@@ -6,7 +6,7 @@ import edu.stonybrook.cs.GerryMander.Model.Enum.ElectionType;
 import javax.persistence.*;
 
 @Entity
-//TODO: add table name annotation
+@Table(name = "electionData")
 public class ElectionData {
     private long id;
     private int year;
@@ -14,6 +14,7 @@ public class ElectionData {
     private String candidate;
     private CandidateParty party;
     private int voteTotal;
+    private Precinct precinct;
 
     @Id
     @GeneratedValue
@@ -65,6 +66,15 @@ public class ElectionData {
 
     public void setVoteTotal(int voteTotal) {
         this.voteTotal = voteTotal;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    public Precinct getPrecinct() {
+        return precinct;
+    }
+
+    public void setPrecinct(Precinct precinct) {
+        this.precinct = precinct;
     }
 
     @Override
