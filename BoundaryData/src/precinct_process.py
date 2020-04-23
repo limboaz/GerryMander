@@ -82,3 +82,26 @@ df_m.to_csv(path_or_buf=csv_file, index=False)
 
 csv_file = 'C:/Users/mlo10/IdeaProjects/GerryMander/BoundaryData/AZ_errors.csv'
 df.to_csv(path_or_buf=csv_file, index=False)
+
+file = 'C:/Users/mlo10/IdeaProjects/GerryMander/ElectionResults/preprocess/ELECTION_DATA/election_data_AZ.csv'
+# df_ed = pd.read_csv(file, usecols=["UID", "State", "County", "Precinct"])
+ed = pd.read_csv(file, usecols=["UID"]).UID.unique()
+
+df_data_errors = pd.DataFrame()
+data_errors = []
+
+#find election data errors
+df_zero_elec = df[~df["UID"].isin(ed)]
+#create errors
+for precinct in df_zero_elec.index:
+    data_errors.append({
+        "Type": error_types[6],
+        "Datasource": "data.gov",
+        "PrecinctsAssociated": df_zero_elec.at[precinct, "UID"],
+        "ErrorValue": 0.0
+    })
+    
+df_data_errors = df_data_errors.append(data_errors, ignore_index=True)
+
+csv_file = 'C:/Users/mlo10/IdeaProjects/GerryMander/BoundaryData/AZ_data_errors.csv'
+df_data_errors.to_csv(path_or_buf=csv_file, index=False)
