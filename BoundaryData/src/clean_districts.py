@@ -1,29 +1,23 @@
-from shapely.geometry import shape
 import json
 import pandas as pd
 
 rows = []
+state_properties = [("AZ", 'CD116FP'), ("OH", 'ID'), ("WI", 'District_N')]
 with open("C:/Users/mlo10/IdeaProjects/GerryMander/assets/assets/congressional_districts.json") as f:
     districts = json.load(f)
-    for district in districts['WI']['features']:
-        rows.append({
-            "STATE": "WI",
-            "DISTRICT": int(district['properties']['District_N']),
-            "BDY": district['geometry']
-        })
-    for district in districts['OH']['features']:
-        rows.append({
-            "STATE": "OH",
-            "DISTRICT": int(district['properties']['ID']),
-            "BDY": district['geometry']
-        })
-        
-    for district in districts['AZ']['features']:
-        rows.append({
-            "STATE": "AZ",
-            "DISTRICT": int(district['properties']['CD116FP'].strip('0')),
-            "BDY": district['geometry']
-        })
+    for state, property_num in state_properties:
+        print(state)
+        print(property_num)
+        for district in districts[state]['features']:
+            num = district['properties'][property_num]
+            if(state == "AZ"):
+                num = num.strip('0')
+            del district["properties"]
+            rows.append({
+                "STATE": state,
+                "DISTRICT": int(num),
+                "BDY": district
+            })
         
 df_c = pd.DataFrame()
 df_c = df_c.append(rows, ignore_index=True)
