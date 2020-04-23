@@ -1,11 +1,20 @@
 import fiona
 import json
+from pprint import pprint
 
 features = []
 crs = None
-with fiona.collection("../raw_data/Geography/Arizona/tabblock2010_04_pophu.shp", "r") as source:
+with fiona.collection("tl_2012_04_vtd10/tl_2012_04_vtd10.shp", "r") as source:
     for feat in source:
-        feat['properties'].update(...) # with your attributes
+        pprint(feat['properties']["NAME10"])
+        county = feat['properties']["COUNTYFP10"]
+        state = feat['properties']["STATEFP10"]
+        name = feat['properties']["NAME10"]
+        feat['properties'].clear()
+        feat['properties'].update(
+            county=county,
+            state=state,
+            name=name) # with your attributes
         features.append(feat)
     crs = " ".join("+%s=%s" % (k,v) for k,v in source.crs.items())
 
