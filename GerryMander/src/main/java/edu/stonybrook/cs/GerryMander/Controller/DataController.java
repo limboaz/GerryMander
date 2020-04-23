@@ -27,7 +27,7 @@ public class DataController {
     private DataService dataService;
 
     @GetMapping("/getprecinctsbycong")
-    public ResponseEntity<List<Precinct>> getPrecinctsByCong(@RequestParam String congressionalID){
+    public ResponseEntity<List<Precinct>> getPrecinctsByCong(@RequestParam long congressionalID){
         HttpStatus status = HttpStatus.OK;
         List<Precinct> result = dataService.getPrecinctsByCong(congressionalID);
         if (result.size() < 1){

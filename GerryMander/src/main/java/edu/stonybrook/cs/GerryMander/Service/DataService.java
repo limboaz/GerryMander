@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,20 +25,16 @@ public class DataService {
 
     private static Logger logger = LoggerFactory.getLogger(DataService.class);
 
-    /*
-     * NOTE: only dummy return values right now.
-     */
-
-    public List<Precinct> getPrecinctsByCong(String congressionalID){
+    public List<Precinct> getPrecinctsByCong(long congressionalID){
         logger.info("getPrecinctsByCong: congressional = " + congressionalID);
-
-        return new ArrayList<Precinct>();
+        Query query = em.createQuery("select * from precinct where cong_district_num = " + congressionalID + ";");
+        return (List<Precinct>)query.getResultList();
     }
 
     public List<CongressionalDistrict> getCongByState(StatePostalCode state){
         logger.info("getCongByState: state = " + state.name());
-
-        return new ArrayList<CongressionalDistrict>();
+        Query query = em.createQuery("select * from congressional_district where state = " + state + ";");
+        return (List<CongressionalDistrict>)query.getResultList();
     }
 
     public State getState(StatePostalCode state){

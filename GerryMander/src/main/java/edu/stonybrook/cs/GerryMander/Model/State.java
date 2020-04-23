@@ -12,9 +12,13 @@ public class State {
 
     private StatePostalCode state;
 
+    private String name;
+
     private List<CongressionalDistrict> congressionalDistricts;
 
     private Set<Error> errors;
+
+    private String stateGeoJson;
 
     @Id
     @Enumerated
@@ -38,12 +42,28 @@ public class State {
     }
 
     @OneToMany(mappedBy = "state")
-    @Column
     public Set<Error> getErrors() {
         return errors;
     }
 
     public void setErrors(Set<Error> errors) {
         this.errors = errors;
+    }
+
+    @Lob
+    public String getStateGeoJson() {
+        return stateGeoJson;
+    }
+
+    public void setStateGeoJson(String stateGeoJson) {
+        this.stateGeoJson = stateGeoJson;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

@@ -4,12 +4,14 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "NeighborData")
 public class NeighborData {
     private long id;
-    private String precinct1;
-    private String precinct2;
+
     private Precinct precinct;
+
+    private String neighborID;
+
+    private String testColumn;
 
     @Id
     @GeneratedValue
@@ -21,20 +23,13 @@ public class NeighborData {
         this.id = id;
     }
 
-    public String getPrecinct1() {
-        return precinct1;
+
+    public String getNeighborID() {
+        return neighborID;
     }
 
-    public void setPrecinct1(String precinct1) {
-        this.precinct1 = precinct1;
-    }
-
-    public String getPrecinct2() {
-        return precinct2;
-    }
-
-    public void setPrecinct2(String precinct2) {
-        this.precinct2 = precinct2;
+    public void setNeighborID(String neighborID) {
+        this.neighborID = neighborID;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -44,5 +39,13 @@ public class NeighborData {
 
     public void setPrecinct(Precinct precinct) {
         this.precinct = precinct;
+    }
+
+    public String getTestColumn() {
+        return testColumn;
+    }
+
+    public void setTestColumn(String testColumn) {
+        this.testColumn = testColumn;
     }
 }
