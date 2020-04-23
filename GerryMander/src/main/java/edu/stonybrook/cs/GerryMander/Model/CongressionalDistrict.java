@@ -1,5 +1,7 @@
 package edu.stonybrook.cs.GerryMander.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import edu.stonybrook.cs.GerryMander.Model.Enum.StatePostalCode;
 
 import javax.persistence.*;
@@ -12,6 +14,7 @@ public class CongressionalDistrict {
     private StatePostalCode stateCode;
     private List<Precinct> precincts;
     private String congressionalDistrictGeoJSON;
+    private State state;
 
     @Id
     @GeneratedValue
@@ -40,7 +43,19 @@ public class CongressionalDistrict {
         this.stateCode = stateCode;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "state_id")
+    @JsonBackReference
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+    }
+
+    @OneToMany(mappedBy = "congressionalDistrict", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     public List<Precinct> getPrecincts() {
         return precincts;
     }

@@ -1,7 +1,8 @@
 package edu.stonybrook.cs.GerryMander.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import edu.stonybrook.cs.GerryMander.Model.Enum.ErrorType;
-import edu.stonybrook.cs.GerryMander.Model.Enum.StatePostalCode;
 
 import javax.persistence.*;
 import java.util.List;
@@ -13,8 +14,8 @@ public abstract class  Error {
     protected long id;
     protected ErrorType type;
     protected String dataSource;
-    protected String precinctID;
-    protected StatePostalCode statePostalCode;
+    protected Precinct precinct;
+    protected State state;
     protected List<Correction> corrections;
 
     @Id
@@ -44,7 +45,19 @@ public abstract class  Error {
         this.dataSource = dataSource;
     }
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
+    @JoinColumn(name = "precinct_uid")
+    public Precinct getPrecinct() {
+        return precinct;
+    }
+
+    public void setPrecinct(Precinct precinct) {
+        this.precinct = precinct;
+    }
+
     @OneToMany(mappedBy = "associatedError", cascade = CascadeType.ALL)
+    @JsonManagedReference
     public List<Correction> getCorrections() {
         return corrections;
     }
@@ -53,19 +66,14 @@ public abstract class  Error {
         this.corrections = corrections;
     }
 
-    public String getPrecinctID() {
-        return precinctID;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "state_id")
+    @JsonBackReference
+    public State getState() {
+        return state;
     }
 
-    public void setPrecinctID(String precinctID) {
-        this.precinctID = precinctID;
-    }
-
-    public StatePostalCode getStatePostalCode() {
-        return statePostalCode;
-    }
-
-    public void setStatePostalCode(StatePostalCode statePostalCode) {
-        this.statePostalCode = statePostalCode;
+    public void setState(State state) {
+        this.state = state;
     }
 }

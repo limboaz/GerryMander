@@ -49,6 +49,6 @@ export class InfoSidenavComponent implements OnInit {
     this.congressionalData = congressionalDataDictionary;
     this.presidentialData = electionData.filter(e => e.type.toString() === ElectionType[ElectionType.PRESIDENTIAL]);
     this.populationData = populationData;
-    this.sidenav.toggle();
+    this.sidenav.open();
   }
 }

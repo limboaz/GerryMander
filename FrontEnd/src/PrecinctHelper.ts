@@ -2,8 +2,11 @@ import {Precinct} from './models/models';
 import {highlightStyle} from './app/styles';
 
 function getNeighbors(precinct: Precinct, currentPrecincts): Precinct[] {
-    return precinct.neighbors.map(p =>
-      p.precinct1 === precinct.uid ? currentPrecincts[p.precinct2] : currentPrecincts[p.precinct1]);
+  if (!precinct.neighbors) {
+    return [];
+  }
+  return precinct.neighbors.map(p =>
+    p.precinct1 === precinct.uid ? currentPrecincts[p.precinct2] : currentPrecincts[p.precinct1]);
 }
 
 export function highlightNeighbors(precinct: Precinct, currentPrecincts) {

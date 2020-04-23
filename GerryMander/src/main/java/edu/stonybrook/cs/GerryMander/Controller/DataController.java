@@ -62,10 +62,24 @@ public class DataController {
         return new ResponseEntity<>(result, status);
     }
 
-    /*
-     * NOTE: with this implementation, it is not necessary to request the precinct data from the backend,
-     * since it would've been retrieved when calling getPrecinctsByCong.
-     */
+    @GetMapping("/getstates")
+    public ResponseEntity<List<State>> getStates(){
+        HttpStatus status = HttpStatus.OK;
+        List<State> result = dataService.getStates();
+        if (result == null){
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+            logger.error("getStates: result is null.");
+        }
+
+        return new ResponseEntity<>(result, status);
+    }
+
+    @GetMapping("/getelectiondata")
+    public ResponseEntity<List<ElectionData>> getElectionData(@RequestParam String uid) {
+        HttpStatus status = HttpStatus.OK;
+        List<ElectionData> result = dataService.getElectionData(uid);
+        return new ResponseEntity<>(result, status);
+    }
 
     @GetMapping("/geterrors")
     public ResponseEntity<List<Error>> getErrors(@RequestParam StatePostalCode state){

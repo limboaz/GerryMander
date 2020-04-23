@@ -1,5 +1,6 @@
 package edu.stonybrook.cs.GerryMander.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import edu.stonybrook.cs.GerryMander.Model.Enum.CorrectionType;
 
 import javax.persistence.*;
@@ -67,6 +68,8 @@ public class Correction {
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "error_id")
+    @JsonBackReference
     public Error getAssociatedError() {
         return associatedError;
     }

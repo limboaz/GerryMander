@@ -1,5 +1,6 @@
 package edu.stonybrook.cs.GerryMander.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import edu.stonybrook.cs.GerryMander.Model.Enum.CandidateParty;
 import edu.stonybrook.cs.GerryMander.Model.Enum.ElectionType;
 
@@ -13,6 +14,7 @@ public class ElectionData {
     private String candidate;
     private CandidateParty party;
     private int voteTotal;
+    private Precinct precinct;
 
     @Id
     @GeneratedValue
@@ -64,6 +66,17 @@ public class ElectionData {
 
     public void setVoteTotal(int voteTotal) {
         this.voteTotal = voteTotal;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "precinct_uid")
+    @JsonBackReference
+    public Precinct getPrecinct() {
+        return precinct;
+    }
+
+    public void setPrecinct(Precinct precinct) {
+        this.precinct = precinct;
     }
 
     @Override

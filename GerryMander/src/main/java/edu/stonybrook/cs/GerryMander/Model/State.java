@@ -1,5 +1,6 @@
 package edu.stonybrook.cs.GerryMander.Model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import edu.stonybrook.cs.GerryMander.Model.Enum.StatePostalCode;
 
 import javax.persistence.*;
@@ -25,8 +26,8 @@ public class State {
         this.state = state;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Column
+    @OneToMany(mappedBy = "state", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     public List<CongressionalDistrict> getCongressionalDistricts() {
         return congressionalDistricts;
     }
@@ -35,7 +36,8 @@ public class State {
         this.congressionalDistricts = congressionalDistricts;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "state", fetch = FetchType.LAZY)
+    @JsonManagedReference
     public Set<Error> getErrors() {
         return errors;
     }

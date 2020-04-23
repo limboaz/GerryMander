@@ -1,7 +1,8 @@
 package edu.stonybrook.cs.GerryMander.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 public class NeighborData {
@@ -29,6 +30,7 @@ public class NeighborData {
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
     public Precinct getPrecinct() {
         return precinct;
     }
