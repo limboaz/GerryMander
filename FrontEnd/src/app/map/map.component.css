@@ -29,6 +29,10 @@
   height: 100%;
 }
 
+.drop-down {
+  padding: 10px;
+}
+
 .sidenav-forms {
   display: flex;
   flex-direction: column;

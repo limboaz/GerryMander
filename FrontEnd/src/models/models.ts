@@ -60,6 +60,7 @@ export interface CongressionalDistrict {
 
 export interface State {
   state: StatePostalCode;
+  name: string;
   congressionalDistricts: CongressionalDistrict[];
   errors: Error[];
   stateGeoJSON;

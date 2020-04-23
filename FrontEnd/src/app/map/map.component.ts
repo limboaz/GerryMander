@@ -38,6 +38,7 @@ export class MapComponent implements AfterViewInit {
   public mapControl;
   public marker;
   public stateCache = {};
+  public stateToLayer = {};
   public uidToPrecinctMap = {};
   public addingNeighbor: boolean;
   public combiningPrecincts: boolean;
@@ -78,6 +79,7 @@ export class MapComponent implements AfterViewInit {
       states.forEach((s) => {
         const layer = l.geoJSON(JSON.parse(s.stateGeoJSON), {style: stateStyle});
         statesLayer.addLayer(layer);
+        this.stateToLayer[s.name] = layer;
         layer.on('click', this.onStateClick(statesLayer, s.state));
       });
 
@@ -138,7 +140,6 @@ export class MapComponent implements AfterViewInit {
   onStateClick(statesLayer, state: StatePostalCode) {
     return e => {
       this.map.setView(e.latlng, 7);
-      this.map.removeLayer(statesLayer);
       this.getCongressionalDistricts(state);
       this.getErrors(state);
     };
@@ -253,5 +254,9 @@ export class MapComponent implements AfterViewInit {
   cancelCombine() {
     this.combiningPrecincts = false;
     this.selectedPrecinct = undefined;
+  }
+
+  goToState(state: string) {
+    this.map.fitBounds(this.stateToLayer[state].getBounds());
   }
 }

@@ -20,6 +20,14 @@
       </mat-form-field>
       <mat-divider></mat-divider>
       <app-error-list></app-error-list>
+      <mat-form-field class="drop-down">
+        <mat-label>State</mat-label>
+        <mat-select>
+          <mat-option *ngFor="let state of ['Arizona', 'Ohio', 'Wisconsin']" (click)="goToState(state)" [value]="state">
+            {{state}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
     </div>
     <app-info-sidenav></app-info-sidenav>
     <div class="map-edit-buttons">

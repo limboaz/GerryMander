@@ -12,9 +12,10 @@
       <mat-expansion-panel *ngFor="let error of currentErrors[errorType]">
         <mat-expansion-panel-header (click)="goToError(error)">
           <mat-panel-title>
-            {{error.id}}
+            ID: {{error.id}}
           </mat-panel-title>
         </mat-expansion-panel-header>
+        Data Source: <a href="https://{{error.dataSource}}" target="_blank">{{error.dataSource}}</a>
       </mat-expansion-panel>
     </div>
   </mat-expansion-panel>
