@@ -84,7 +84,6 @@ csv_file = 'C:/Users/mlo10/IdeaProjects/GerryMander/BoundaryData/AZ_errors.csv'
 df.to_csv(path_or_buf=csv_file, index=False)
 
 file = 'C:/Users/mlo10/IdeaProjects/GerryMander/ElectionResults/preprocess/ELECTION_DATA/election_data_AZ.csv'
-# df_ed = pd.read_csv(file, usecols=["UID", "State", "County", "Precinct"])
 ed = pd.read_csv(file, usecols=["UID"]).UID.unique()
 
 df_data_errors = pd.DataFrame()
