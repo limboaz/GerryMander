@@ -24,6 +24,10 @@ public class DataService {
     public List<Precinct> getPrecinctsByCong(long congressionalID){
         logger.info("getPrecinctsByCong: congressional = " + congressionalID);
         CongressionalDistrict cd = em.find(CongressionalDistrict.class, congressionalID);
+        if (cd.getPrecincts() == null) {
+            return List.of();
+        }
+
         for (Precinct p: cd.getPrecincts()) {
             p.setErrors(null);
             p.setNeighbors(null);

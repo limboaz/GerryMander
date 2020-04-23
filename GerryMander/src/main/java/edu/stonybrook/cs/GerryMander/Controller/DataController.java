@@ -31,7 +31,7 @@ public class DataController {
         HttpStatus status = HttpStatus.OK;
         List<Precinct> result = dataService.getPrecinctsByCong(congressionalID);
         if (result.size() < 1){
-            status = HttpStatus.INTERNAL_SERVER_ERROR;
+            status = HttpStatus.NOT_FOUND;
             logger.error("getPrecinctsByCong: result size is 0.");
         }
 
@@ -43,7 +43,7 @@ public class DataController {
         HttpStatus status = HttpStatus.OK;
         List<CongressionalDistrict> result = dataService.getCongByState(state);
         if (result.size() < 1){
-            status = HttpStatus.INTERNAL_SERVER_ERROR;
+            status = HttpStatus.NOT_FOUND;
             logger.error("getCongByState: result size is 0.");
         }
 
@@ -66,8 +66,8 @@ public class DataController {
     public ResponseEntity<List<State>> getStates(){
         HttpStatus status = HttpStatus.OK;
         List<State> result = dataService.getStates();
-        if (result == null){
-            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        if (result.size() < 1){
+            status = HttpStatus.NOT_FOUND;
             logger.error("getStates: result is null.");
         }
 
@@ -78,6 +78,10 @@ public class DataController {
     public ResponseEntity<List<ElectionData>> getElectionData(@RequestParam String uid) {
         HttpStatus status = HttpStatus.OK;
         List<ElectionData> result = dataService.getElectionData(uid);
+        if (result.size() < 1) {
+            status = HttpStatus.NOT_FOUND;
+            logger.error("no election data");
+        }
         return new ResponseEntity<>(result, status);
     }
 
@@ -86,7 +90,7 @@ public class DataController {
         HttpStatus status = HttpStatus.OK;
         List<Error> result = dataService.getErrors(state);
         if (result.size() < 1){
-            status = HttpStatus.INTERNAL_SERVER_ERROR;
+            status = HttpStatus.NOT_FOUND;
             logger.error("getErrors: result size is 0.");
         }
         return new ResponseEntity<>(result, status);
@@ -97,7 +101,7 @@ public class DataController {
         HttpStatus status = HttpStatus.OK;
         List<Correction> result = dataService.getCorrectionLog();
         if (result.size() < 1){
-            status = HttpStatus.INTERNAL_SERVER_ERROR;
+            status = HttpStatus.NOT_FOUND;
             logger.error("getCorrectionLog: result size is 0.");
         }
         return new ResponseEntity<>(result, status);

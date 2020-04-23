@@ -110,7 +110,7 @@ export class MapComponent implements AfterViewInit {
         // alternatively display all the precinct boundaries at this point instead of district ones
         const districtGeoJSONs = congressionalDistricts.map(d => {
           d.congressionalDistrictGeoJSON = JSON.parse(d.congressionalDistrictGeoJSON);
-          d.congressionalDistrictGeoJSON.properties.districtNum = d.districtNum;
+          d.congressionalDistrictGeoJSON.properties = {districtNum: d.districtNum};
           return d.congressionalDistrictGeoJSON;
         });
 
@@ -172,7 +172,7 @@ export class MapComponent implements AfterViewInit {
         this.uidToPrecinctMap = {};
         const precinctLayers = precincts.map(p => {
           p.precinctGeoJSON = JSON.parse(p.precinctGeoJSON);
-          p.precinctGeoJSON.properties.uid = p.uid;
+          p.precinctGeoJSON.properties = {uid: p.uid};
           const precinctLayer = l.geoJSON(p.precinctGeoJSON, {style: precinctStyle});
           p.layer = precinctLayer;
           precinctLayer.wrapperPrecinct = p;
