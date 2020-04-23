@@ -154,7 +154,7 @@ export class MapComponent implements AfterViewInit {
 
   onPrecinctMouseOver(feature, layer) {
     return () => layer.bindTooltip('Name: ' + layer.wrapperPrecinct.name
-      + ' Total Population: ' + layer.wrapperPrecinct.totalPopulation).openTooltip();
+      + ' Total Population: ' + layer.wrapperPrecinct.populationData.total).openTooltip();
   }
 
   getPrecincts(districtNum: number): void {

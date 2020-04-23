@@ -45,7 +45,6 @@ export interface Precinct {
   neighbors: NeighborData[];
   electionData: ElectionData[];
   populationData: PopulationData;
-  totalPopulation: number;
   precinctGeoJSON;
   layer;
   highlighted;

@@ -22,7 +22,6 @@ public class Precinct {
     private PopulationData populationData;
     private String precinctGeoJSON;
     private List<NeighborData> neighbors;
-    private long totalPopulation;
 
     public Precinct(){
 
@@ -132,14 +131,6 @@ public class Precinct {
 
     public void setNeighbors(List<NeighborData> neighbors) {
         this.neighbors = neighbors;
-    }
-
-    public long getTotalPopulation() {
-        return totalPopulation;
-    }
-
-    public void setTotalPopulation(long totalPopulation) {
-        this.totalPopulation = totalPopulation;
     }
 
     @Override
