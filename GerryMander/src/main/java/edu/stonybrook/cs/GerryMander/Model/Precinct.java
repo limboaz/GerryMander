@@ -12,7 +12,6 @@ public class Precinct {
     private String uid;
     private StatePostalCode state;
     private int congDistrictNum;
-    private CongressionalDistrict congressionalDistrict;
     private String county;
     private String name;
     private List<Error> errors;
@@ -40,14 +39,6 @@ public class Precinct {
         this.uid = uid;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    public CongressionalDistrict getCongressionalDistrict() {
-        return congressionalDistrict;
-    }
-
-    public void setCongressionalDistrict(CongressionalDistrict congressionalDistrict) {
-        this.congressionalDistrict = congressionalDistrict;
-    }
 
     @Enumerated(EnumType.ORDINAL)
     public StatePostalCode getState() {
@@ -82,7 +73,7 @@ public class Precinct {
         this.name = name;
     }
 
-    @OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     public List<Error> getErrors() {
         return errors;
     }
@@ -91,7 +82,7 @@ public class Precinct {
         this.errors = errors;
     }
 
-    @OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     public List<ElectionData> getElectionData() {
         return electionData;
     }
@@ -100,7 +91,7 @@ public class Precinct {
         this.electionData = electionData;
     }
 
-    @OneToOne(mappedBy = "precinct", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "precinct", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     public PopulationData getPopulationData() {
         return populationData;
     }
@@ -118,7 +109,7 @@ public class Precinct {
         this.precinctGeoJSON = precinctGeoJSON;
     }
 
-    @OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     public List<NeighborData> getNeighbors() {
         return neighbors;
     }

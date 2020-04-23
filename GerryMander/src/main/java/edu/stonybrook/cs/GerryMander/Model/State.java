@@ -25,7 +25,7 @@ public class State {
         this.state = state;
     }
 
-    @OneToMany(mappedBy = "state", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "state", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Column
     public List<CongressionalDistrict> getCongressionalDistricts() {
         return congressionalDistricts;
@@ -35,7 +35,7 @@ public class State {
         this.congressionalDistricts = congressionalDistricts;
     }
 
-    @OneToMany(mappedBy = "state")
+    @OneToMany(mappedBy = "state", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     public Set<Error> getErrors() {
         return errors;
     }

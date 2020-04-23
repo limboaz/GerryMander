@@ -89,7 +89,6 @@ public class PopulationData {
         this.other = other;
     }
 
-    @OneToOne(fetch = FetchType.LAZY)
     public Precinct getPrecinct() {
         return precinct;
     }

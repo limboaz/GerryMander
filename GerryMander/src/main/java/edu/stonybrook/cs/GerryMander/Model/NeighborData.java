@@ -8,7 +8,6 @@ public class NeighborData {
     private long id;
     private Precinct precinct;
     private String neighborID;
-    private String testColumn;
 
     @Id
     @GeneratedValue
@@ -38,11 +37,4 @@ public class NeighborData {
         this.precinct = precinct;
     }
 
-    public String getTestColumn() {
-        return testColumn;
-    }
-
-    public void setTestColumn(String testColumn) {
-        this.testColumn = testColumn;
-    }
 }

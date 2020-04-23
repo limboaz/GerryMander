@@ -13,7 +13,6 @@ public class ElectionData {
     private String candidate;
     private CandidateParty party;
     private int voteTotal;
-    private Precinct precinct;
 
     @Id
     @GeneratedValue
@@ -65,15 +64,6 @@ public class ElectionData {
 
     public void setVoteTotal(int voteTotal) {
         this.voteTotal = voteTotal;
-    }
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    public Precinct getPrecinct() {
-        return precinct;
-    }
-
-    public void setPrecinct(Precinct precinct) {
-        this.precinct = precinct;
     }
 
     @Override

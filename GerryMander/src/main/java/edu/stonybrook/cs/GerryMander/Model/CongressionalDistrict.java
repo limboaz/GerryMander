@@ -12,7 +12,6 @@ public class CongressionalDistrict {
     private StatePostalCode stateCode;
     private List<Precinct> precincts;
     private String congressionalDistrictGeoJSON;
-    private State state;
 
     @Id
     @GeneratedValue
@@ -41,16 +40,7 @@ public class CongressionalDistrict {
         this.stateCode = stateCode;
     }
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    public State getState() {
-        return state;
-    }
-
-    public void setState(State state) {
-        this.state = state;
-    }
-
-    @OneToMany(mappedBy = "congressionalDistrict", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "congressionalDistrict", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     public List<Precinct> getPrecincts() {
         return precincts;
     }

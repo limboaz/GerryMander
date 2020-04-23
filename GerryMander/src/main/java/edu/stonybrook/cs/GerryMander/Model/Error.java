@@ -1,6 +1,7 @@
 package edu.stonybrook.cs.GerryMander.Model;
 
 import edu.stonybrook.cs.GerryMander.Model.Enum.ErrorType;
+import edu.stonybrook.cs.GerryMander.Model.Enum.StatePostalCode;
 
 import javax.persistence.*;
 import java.util.List;
@@ -12,8 +13,8 @@ public abstract class  Error {
     protected long id;
     protected ErrorType type;
     protected String dataSource;
-    protected Precinct precinct;
-    protected State state;
+    protected String precinctID;
+    protected StatePostalCode statePostalCode;
     protected List<Correction> corrections;
 
     @Id
@@ -43,15 +44,6 @@ public abstract class  Error {
         this.dataSource = dataSource;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    public Precinct getPrecinct() {
-        return precinct;
-    }
-
-    public void setPrecinct(Precinct precinct) {
-        this.precinct = precinct;
-    }
-
     @OneToMany(mappedBy = "associatedError", cascade = CascadeType.ALL)
     public List<Correction> getCorrections() {
         return corrections;
@@ -61,12 +53,19 @@ public abstract class  Error {
         this.corrections = corrections;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    public State getState() {
-        return state;
+    public String getPrecinctID() {
+        return precinctID;
     }
 
-    public void setState(State state) {
-        this.state = state;
+    public void setPrecinctID(String precinctID) {
+        this.precinctID = precinctID;
+    }
+
+    public StatePostalCode getStatePostalCode() {
+        return statePostalCode;
+    }
+
+    public void setStatePostalCode(StatePostalCode statePostalCode) {
+        this.statePostalCode = statePostalCode;
     }
 }
