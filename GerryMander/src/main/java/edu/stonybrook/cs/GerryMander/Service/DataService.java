@@ -27,13 +27,13 @@ public class DataService {
 
     public List<Precinct> getPrecinctsByCong(long congressionalID){
         logger.info("getPrecinctsByCong: congressional = " + congressionalID);
-        Query query = em.createQuery("select * from precinct where cong_district_num = " + congressionalID + ";");
+        Query query = em.createQuery("from Precinct P where P.congDistrictNum = " + congressionalID);
         return (List<Precinct>)query.getResultList();
     }
 
     public List<CongressionalDistrict> getCongByState(StatePostalCode state){
         logger.info("getCongByState: state = " + state.name());
-        Query query = em.createQuery("select * from congressional_district where state = " + state + ";");
+        Query query = em.createQuery("from CongressionalDistrict CD where CD.stateCode = " + state.ordinal());
         return (List<CongressionalDistrict>)query.getResultList();
     }
 

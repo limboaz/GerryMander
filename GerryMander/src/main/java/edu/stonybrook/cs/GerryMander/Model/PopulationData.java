@@ -13,7 +13,6 @@ public class PopulationData {
     private int nativeAmerican;
     private int pacificIslander;
     private int other;
-    private Precinct precinct;
 
     @Id
     @GeneratedValue
@@ -87,13 +86,5 @@ public class PopulationData {
 
     public void setOther(int other) {
         this.other = other;
-    }
-
-    public Precinct getPrecinct() {
-        return precinct;
-    }
-
-    public void setPrecinct(Precinct precinct) {
-        this.precinct = precinct;
     }
 }

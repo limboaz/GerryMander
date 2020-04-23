@@ -40,7 +40,7 @@ public class CongressionalDistrict {
         this.stateCode = stateCode;
     }
 
-    @OneToMany(mappedBy = "congressionalDistrict", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     public List<Precinct> getPrecincts() {
         return precincts;
     }

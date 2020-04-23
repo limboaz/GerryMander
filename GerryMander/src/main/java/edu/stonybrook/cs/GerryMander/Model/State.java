@@ -12,7 +12,7 @@ public class State {
     private String name;
     private List<CongressionalDistrict> congressionalDistricts;
     private Set<Error> errors;
-    private String stateGeoJson;
+    private String stateGeoJSON;
 
     @Id
     @Enumerated
@@ -25,7 +25,7 @@ public class State {
         this.state = state;
     }
 
-    @OneToMany(mappedBy = "state", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Column
     public List<CongressionalDistrict> getCongressionalDistricts() {
         return congressionalDistricts;
@@ -35,7 +35,7 @@ public class State {
         this.congressionalDistricts = congressionalDistricts;
     }
 
-    @OneToMany(mappedBy = "state", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     public Set<Error> getErrors() {
         return errors;
     }
@@ -45,12 +45,12 @@ public class State {
     }
 
     @Lob
-    public String getStateGeoJson() {
-        return stateGeoJson;
+    public String getStateGeoJSON() {
+        return stateGeoJSON;
     }
 
-    public void setStateGeoJson(String stateGeoJson) {
-        this.stateGeoJson = stateGeoJson;
+    public void setStateGeoJSON(String stateGeoJson) {
+        this.stateGeoJSON = stateGeoJson;
     }
 
     public String getName() {

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name = "precinct")
 public class Precinct {
     private String uid;
     private StatePostalCode state;
@@ -73,7 +72,7 @@ public class Precinct {
         this.name = name;
     }
 
-    @OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     public List<Error> getErrors() {
         return errors;
     }
@@ -82,7 +81,7 @@ public class Precinct {
         this.errors = errors;
     }
 
-    @OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     public List<ElectionData> getElectionData() {
         return electionData;
     }
@@ -91,7 +90,7 @@ public class Precinct {
         this.electionData = electionData;
     }
 
-    @OneToOne(mappedBy = "precinct", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     public PopulationData getPopulationData() {
         return populationData;
     }

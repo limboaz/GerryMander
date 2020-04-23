@@ -2,11 +2,10 @@ import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import * as l from 'leaflet';
 import {icon, Marker} from 'leaflet';
-import * as statesGeoJSON from '../../assets/us_states_500K.json';
 import {InfoSidenavComponent} from '../info-sidenav/info-sidenav.component';
 import {ErrorListComponent} from '../error-list/error-list.component';
 import {StatePostalCode} from '../../models/enums';
-import {Precinct, State} from '../../models/models';
+import {CongressionalDistrict, Precinct, State} from '../../models/models';
 import {districtStyle, precinctStyle, selectedStyle, stateStyle} from '../styles';
 import {addNeighbor, highlightNeighbors, mergePrecincts, resetNeighbors} from '../../PrecinctHelper';
 import {AttributeMenuComponent} from '../attribute-menu/attribute-menu.component';
@@ -25,15 +24,6 @@ const iconDefault = icon({
   shadowSize: [41, 41]
 });
 Marker.prototype.options.icon = iconDefault;
-
-const states = (statesGeoJSON as any).features
-  .filter(e => ['WI', 'AZ', 'OH'].includes(e.properties.STUSPS))
-  .map(e => {
-    const s = l.geoJSON(e, {style: stateStyle});
-    s.statePostalCode = StatePostalCode[e.properties.STUSPS];
-    s.NAME = e.properties.NAME;
-    return s;
-  });
 
 @Component({
   selector: 'app-map',
@@ -60,7 +50,8 @@ export class MapComponent implements AfterViewInit {
   @ViewChild(AttributeMenuComponent)
   public attrMenu: AttributeMenuComponent;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+  }
 
   ngAfterViewInit(): void {
     const tiles = l.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -79,43 +70,48 @@ export class MapComponent implements AfterViewInit {
     this.errorList.map = this.map;
     tiles.addTo(this.map);
 
-    const statesLayer = l.layerGroup(states); // Layer to show the state borders
-    statesLayer.addTo(this.map);
-    l.control.zoom({position: 'bottomright'}).addTo(this.map);
-    this.marker = l.marker([0, 0]).addTo(this.map);
-    this.marker.on('click', () => this.infoSidenav.sidenav.toggle());
-    for (const s of states) {
-      s.on('click', e => {
-        this.map.setView(e.latlng, 7);
-        this.map.removeLayer(statesLayer);
-        this.getState(s.statePostalCode);
-      });
-    }
-    this.map.on('zoomend', e => { // Change which layer is visible based on how zoomed in the map is
-      if (this.map.getZoom() <= 5.5) {
-        this.map.removeLayer(this.districtsLayer);
-        this.map.addLayer(statesLayer);
-      } else if (this.map.getZoom() <= 8) {
-        if (this.currentDistrictsPrecincts) {
-          this.map.removeLayer(this.currentDistrictsPrecincts.layerGroup);
-        }
+    this.http.get<State>('/data/getstate?state=AZ').subscribe((state: any) => {
+      console.log(state);
+      const states = [l.geoJSON(JSON.parse(state.stateGeoJSON), {style: stateStyle})];
+      const statesLayer = l.layerGroup(states); // Layer to show the state borders
+      statesLayer.addTo(this.map);
+      l.control.zoom({position: 'bottomright'}).addTo(this.map);
+      this.marker = l.marker([0, 0]).addTo(this.map);
+      this.marker.on('click', () => this.infoSidenav.sidenav.toggle());
+      for (const s of states) {
+        s.on('click', e => {
+          this.map.setView(e.latlng, 7);
+          this.map.removeLayer(statesLayer);
+          this.getState(StatePostalCode[state.state]);
+        });
       }
+      this.map.on('zoomend', e => { // Change which layer is visible based on how zoomed in the map is
+        if (this.map.getZoom() <= 5.5) {
+          this.map.removeLayer(this.districtsLayer);
+          this.map.addLayer(statesLayer);
+        } else if (this.map.getZoom() <= 8) {
+          if (this.currentDistrictsPrecincts) {
+            this.map.removeLayer(this.currentDistrictsPrecincts.layerGroup);
+          }
+        }
+      });
+      this.mapControl = l.control.layers({}, {States: statesLayer});
+      this.mapControl.addTo(this.map);
+      this.mapControl.addOverlay(this.errorList.addErrors(state.errors), 'Errors');
     });
-    this.mapControl = l.control.layers({}, {States: statesLayer});
-    this.mapControl.addTo(this.map);
   }
 
-  getState(state: StatePostalCode): void {
+  getState(state: string): void {
     if (this.stateCache[state]) {
       this.map.addLayer(this.districtsLayer);
       return;
     }
 
-    this.http.get<State>(`/data/getstate?state=${StatePostalCode[state]}`)
-      .subscribe((data: State) => {
-        console.log(data);
+    this.http.get<CongressionalDistrict[]>(`/data/getcongbystate?state=${StatePostalCode[state]}`)
+      .subscribe((congressionalDistricts: CongressionalDistrict[]) => {
+        console.log(congressionalDistricts);
         // alternatively display all the precinct boundaries at this point instead of district ones
-        const districtGeoJSONs = data.congressionalDistricts.map(d => {
+        const districtGeoJSONs = congressionalDistricts.map(d => {
           d.congressionalDistrictGeoJSON = JSON.parse(d.congressionalDistrictGeoJSON);
           d.congressionalDistrictGeoJSON.properties.districtNum = d.districtNum;
           return d.congressionalDistrictGeoJSON;
@@ -129,9 +125,8 @@ export class MapComponent implements AfterViewInit {
         };
         const district = l.geoJSON(districtGeoJSONs, {style: districtStyle, onEachFeature: onEachDistrictFeature});
 
-        this.mapControl.addOverlay(this.errorList.addErrors(data.errors), 'Errors');
-        this.stateCache[state] = data;
         this.districtsLayer.addLayer(district);
+        this.stateCache[state] = congressionalDistricts;
         this.map.addLayer(this.districtsLayer);
         this.mapControl.addOverlay(this.districtsLayer, 'Districts');
       }, error => console.log(error));
@@ -165,7 +160,6 @@ export class MapComponent implements AfterViewInit {
         this.uidToPrecinctMap = {};
         const precinctLayers = data.map(p => {
           p.precinctGeoJSON = JSON.parse(p.precinctGeoJSON);
-          p.precinctGeoJSON.properties = {uid: p.uid};
           const precinctLayer = l.geoJSON(p.precinctGeoJSON, {style: precinctStyle});
           p.layer = precinctLayer;
           precinctLayer.wrapperPrecinct = p;
@@ -222,10 +216,10 @@ export class MapComponent implements AfterViewInit {
         this.selectedPrecinct.layer.setStyle(selectedStyle);
       }
     } else if (this.addingNeighbor) {
-        addNeighbor(this.selectedPrecinct, precinct);
-        this.addingNeighbor = false;
-        resetNeighbors(this.selectedPrecinct, this.currentDistrictsPrecincts);
-        highlightNeighbors(this.selectedPrecinct, this.currentDistrictsPrecincts);
+      addNeighbor(this.selectedPrecinct, precinct);
+      this.addingNeighbor = false;
+      resetNeighbors(this.selectedPrecinct, this.currentDistrictsPrecincts);
+      highlightNeighbors(this.selectedPrecinct, this.currentDistrictsPrecincts);
     } else {
       if (this.selectedPrecinct) {
         this.selectedPrecinct.layer.resetStyle();
