@@ -6,7 +6,6 @@ import edu.stonybrook.cs.GerryMander.Model.Enum.ElectionType;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "electionData")
 public class ElectionData {
     private long id;
     private int year;

@@ -3,21 +3,15 @@ package edu.stonybrook.cs.GerryMander.Model;
 import edu.stonybrook.cs.GerryMander.Model.Enum.StatePostalCode;
 
 import javax.persistence.*;
-import javax.websocket.ClientEndpoint;
 import java.util.List;
 import java.util.Set;
 
 @Entity
 public class State {
-
     private StatePostalCode state;
-
     private String name;
-
     private List<CongressionalDistrict> congressionalDistricts;
-
     private Set<Error> errors;
-
     private String stateGeoJson;
 
     @Id

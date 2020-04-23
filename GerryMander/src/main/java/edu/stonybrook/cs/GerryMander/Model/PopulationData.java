@@ -3,7 +3,6 @@ package edu.stonybrook.cs.GerryMander.Model;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "PopulationData")
 public class PopulationData {
     private long id;
     private int total;

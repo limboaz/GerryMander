@@ -6,7 +6,6 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "correction")
 public class Correction {
     private long id;
     private CorrectionType type;

@@ -31,7 +31,7 @@ public class Precinct {
     }
 
     @Id
-    @Column(name = "uid", length = 100)
+    @Column(length = 100)
     public String getUid() {
         return uid;
     }

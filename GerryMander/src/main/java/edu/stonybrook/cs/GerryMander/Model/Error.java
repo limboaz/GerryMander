@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "error")
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class  Error {
     protected long id;
@@ -18,7 +17,6 @@ public abstract class  Error {
     protected List<Correction> corrections;
 
     @Id
-    @Column(name = "id")
     @GeneratedValue
     public long getId() {
         return id;

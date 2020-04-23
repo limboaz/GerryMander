@@ -7,9 +7,7 @@ import javax.persistence.Table;
 import java.util.HashSet;
 
 @Entity
-@Table(name = "boundary_error")
 public class BoundaryError extends Error {
-
     @Lob
     private String errorBoundaryGeoJSON;
 

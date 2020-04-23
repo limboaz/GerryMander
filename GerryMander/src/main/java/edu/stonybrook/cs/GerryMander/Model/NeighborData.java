@@ -6,11 +6,8 @@ import java.util.List;
 @Entity
 public class NeighborData {
     private long id;
-
     private Precinct precinct;
-
     private String neighborID;
-
     private String testColumn;
 
     @Id

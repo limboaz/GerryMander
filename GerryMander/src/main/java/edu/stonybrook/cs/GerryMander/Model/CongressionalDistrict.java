@@ -6,7 +6,6 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "congressional_district")
 public class CongressionalDistrict {
     private long id;
     private int districtNum;
@@ -17,7 +16,6 @@ public class CongressionalDistrict {
 
     @Id
     @GeneratedValue
-    @Column(name = "id")
     public long getId() {
         return id;
     }
