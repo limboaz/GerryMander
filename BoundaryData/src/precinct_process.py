@@ -37,7 +37,7 @@ df_errors = pd.DataFrame()
 rows = []
 errors = []
 
-csv_file = 'C:/Users/mlo10/IdeaProjects/GerryMander/BoundaryData/CongDistrcts.csv'
+csv_file = '../preprocessing/CongDistrcts.csv'
 df_c = pd.read_csv(csv_file)
 
 def get_district(bdy, state):
@@ -51,7 +51,7 @@ def get_district(bdy, state):
             return districts.at[district, 'DISTRICT']
 
 #load precinct geojson
-with open("C:/Users/mlo10/IdeaProjects/GerryMander/BoundaryData/raw_data/GeoJSON/arizona.json") as f:
+with open("../raw_data/GeoJSON/arizona.json") as f:
     #create strTree for precincts
     for precinct in json.load(f)['features']:
         county = county_map[int(precinct["properties"]["county"].lstrip("0"))]
@@ -77,13 +77,13 @@ with open("C:/Users/mlo10/IdeaProjects/GerryMander/BoundaryData/raw_data/GeoJSON
 df = df.append(rows, ignore_index=True)
 df_errors = df_errors.append(errors, ignore_index=True)
 
-csv_file = 'C:/Users/mlo10/IdeaProjects/GerryMander/BoundaryData/AZ.csv'
+csv_file = '../preprocessing/AZ.csv'
 df_m.to_csv(path_or_buf=csv_file, index=False)
 
-csv_file = 'C:/Users/mlo10/IdeaProjects/GerryMander/BoundaryData/AZ_errors.csv'
+csv_file = '../preprocessing/AZ_errors.csv'
 df.to_csv(path_or_buf=csv_file, index=False)
 
-file = 'C:/Users/mlo10/IdeaProjects/GerryMander/ElectionResults/preprocess/ELECTION_DATA/election_data_AZ.csv'
+file = '../../ElectionResults/preprocess/ELECTION_DATA/election_data_AZ.csv'
 ed = pd.read_csv(file, usecols=["UID"]).UID.unique()
 
 df_data_errors = pd.DataFrame()
@@ -102,5 +102,5 @@ for precinct in df_zero_elec.index:
     
 df_data_errors = df_data_errors.append(data_errors, ignore_index=True)
 
-csv_file = 'C:/Users/mlo10/IdeaProjects/GerryMander/BoundaryData/AZ_data_errors.csv'
+csv_file = '../preprocessing/AZ_data_errors.csv'
 df_data_errors.to_csv(path_or_buf=csv_file, index=False)

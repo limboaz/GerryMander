@@ -3,7 +3,7 @@ import pandas as pd
 
 rows = []
 state_properties = [("AZ", 'CD116FP'), ("OH", 'ID'), ("WI", 'District_N')]
-with open("C:/Users/mlo10/IdeaProjects/GerryMander/assets/assets/congressional_districts.json") as f:
+with open("../assets/congressional_districts.json") as f:
     districts = json.load(f)
     for state, property_num in state_properties:
         print(state)
@@ -22,5 +22,5 @@ with open("C:/Users/mlo10/IdeaProjects/GerryMander/assets/assets/congressional_d
 df_c = pd.DataFrame()
 df_c = df_c.append(rows, ignore_index=True)
 
-csv_file = 'C:/Users/mlo10/IdeaProjects/GerryMander/BoundaryData/CongDistrcts.csv'
+csv_file = '../preprocessing/CongDistrcts.csv'
 df_c.to_csv(path_or_buf=csv_file, index=False)
