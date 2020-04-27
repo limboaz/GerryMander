@@ -1,8 +1,7 @@
-import {Component, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
-import {Demographic} from '../demographic.model';
-import {DialogButtonComponent} from '../dialog-button/dialog-button.component';
-import {ElectionData} from '../presidential.model';
+import {PopulationData, ElectionData} from '../../models/models';
+import {CandidateParty, ElectionType} from '../../models/enums';
 
 @Component({
   selector: 'app-info-sidenav',
@@ -12,36 +11,43 @@ import {ElectionData} from '../presidential.model';
 export class InfoSidenavComponent implements OnInit {
   @ViewChild(MatSidenav)
   public sidenav: MatSidenav;
-  @Input() demographicGroups = new Demographic();
-  @Input() comment =  '';
-  @Input() presidentialData: ElectionData;
-  public congressionalData = [];
-  public labelMap = {
-    voteTotal: 'Total Votes',
-    pollingPlaceVotes: 'Polling Place Votes',
-    otherVotes: 'Other Votes',
-    earlyVotes: 'Early Votes'
-  };
-  public labelKeys = Object.keys(this.labelMap);
-  public demographicLabels = {
+
+  CandidateParty = CandidateParty;
+  populationData: PopulationData;
+  presidentialData: ElectionData[];
+  congressionalData;
+
+  populationLabels = {
     total: 'Total',
     white: 'White',
     black: 'Black or African American',
     asian: 'Asian',
-    hawaiian: 'Native Hawaiian and Other Pacific Islander',
+    pacificIslander: 'Native Hawaiian and Other Pacific Islander',
     hispanic: 'Hispanic',
+    nativeAmerican: 'Native American',
     others: 'Others'
   };
-  public demographicKeys = Object.keys(this.demographicLabels);
+  populationKeys = Object.keys(this.populationLabels);
 
-  constructor() {
-    this.demographicGroups.setData('undefined', 0 , 0 , 0 , 0 , 0 , 0 );
-  }
+  constructor() {}
 
   ngOnInit(): void {
   }
 
-  toggle() {
-    this.sidenav.toggle();
+  addElectionData(electionData: ElectionData[]) {
+    const congressionalData = electionData.filter(e => e.type.toString() === ElectionType[ElectionType.CONGRESSIONAL]);
+    const congressionalDataDictionary = {};
+
+    for (const candidate of congressionalData) {
+      if (congressionalDataDictionary[candidate.year]) {
+        congressionalDataDictionary[candidate.year].push(candidate);
+      } else {
+        congressionalDataDictionary[candidate.year] = [candidate];
+      }
+    }
+
+    this.congressionalData = congressionalDataDictionary;
+    this.presidentialData = electionData.filter(e => e.type.toString() === ElectionType[ElectionType.PRESIDENTIAL]);
+    this.sidenav.open();
   }
 }

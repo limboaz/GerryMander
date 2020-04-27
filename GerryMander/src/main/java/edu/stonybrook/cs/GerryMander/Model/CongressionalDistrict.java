@@ -1,5 +1,7 @@
 package edu.stonybrook.cs.GerryMander.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import edu.stonybrook.cs.GerryMander.Model.Enum.StatePostalCode;
 
 import javax.persistence.*;
@@ -9,9 +11,10 @@ import java.util.List;
 public class CongressionalDistrict {
     private long id;
     private int districtNum;
-    private StatePostalCode state;
+    private StatePostalCode stateCode;
     private List<Precinct> precincts;
     private String congressionalDistrictGeoJSON;
+    private State state;
 
     @Id
     @GeneratedValue
@@ -31,16 +34,28 @@ public class CongressionalDistrict {
         this.districtNum = districtNum;
     }
 
-    @Enumerated(EnumType.ORDINAL)
-    public StatePostalCode getState() {
+    @Enumerated
+    public StatePostalCode getStateCode() {
+        return stateCode;
+    }
+
+    public void setStateCode(StatePostalCode stateCode) {
+        this.stateCode = stateCode;
+    }
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "state_id")
+    @JsonBackReference
+    public State getState() {
         return state;
     }
 
-    public void setState(StatePostalCode state) {
+    public void setState(State state) {
         this.state = state;
     }
 
-    @OneToMany
+    @OneToMany(mappedBy = "congressionalDistrict", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     public List<Precinct> getPrecincts() {
         return precincts;
     }
@@ -49,6 +64,7 @@ public class CongressionalDistrict {
         this.precincts = precincts;
     }
 
+    @Lob
     public String getCongressionalDistrictGeoJSON() {
         return congressionalDistrictGeoJSON;
     }

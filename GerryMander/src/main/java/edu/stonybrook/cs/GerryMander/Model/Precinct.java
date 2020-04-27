@@ -1,5 +1,7 @@
 package edu.stonybrook.cs.GerryMander.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import edu.stonybrook.cs.GerryMander.Model.Enum.StatePostalCode;
 
 import javax.persistence.*;
@@ -7,10 +9,12 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
+@Table(name = "precinct")
 public class Precinct {
     private String uid;
     private StatePostalCode state;
     private int congDistrictNum;
+    private CongressionalDistrict congressionalDistrict;
     private String county;
     private String name;
     private List<Error> errors;
@@ -18,7 +22,6 @@ public class Precinct {
     private PopulationData populationData;
     private String precinctGeoJSON;
     private List<NeighborData> neighbors;
-    private long totalPopulation;
 
     public Precinct(){
 
@@ -29,12 +32,23 @@ public class Precinct {
     }
 
     @Id
+    @Column(length = 100)
     public String getUid() {
         return uid;
     }
 
     public void setUid(String uid) {
         this.uid = uid;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
+    public CongressionalDistrict getCongressionalDistrict() {
+        return congressionalDistrict;
+    }
+
+    public void setCongressionalDistrict(CongressionalDistrict congressionalDistrict) {
+        this.congressionalDistrict = congressionalDistrict;
     }
 
     @Enumerated(EnumType.ORDINAL)
@@ -70,7 +84,8 @@ public class Precinct {
         this.name = name;
     }
 
-    @OneToMany
+    @OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     public List<Error> getErrors() {
         return errors;
     }
@@ -79,7 +94,8 @@ public class Precinct {
         this.errors = errors;
     }
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     public List<ElectionData> getElectionData() {
         return electionData;
     }
@@ -88,7 +104,8 @@ public class Precinct {
         this.electionData = electionData;
     }
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "precinct", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference
     public PopulationData getPopulationData() {
         return populationData;
     }
@@ -97,6 +114,7 @@ public class Precinct {
         this.populationData = populationData;
     }
 
+    @Lob
     public String getPrecinctGeoJSON() {
         return precinctGeoJSON;
     }
@@ -105,21 +123,14 @@ public class Precinct {
         this.precinctGeoJSON = precinctGeoJSON;
     }
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     public List<NeighborData> getNeighbors() {
         return neighbors;
     }
 
     public void setNeighbors(List<NeighborData> neighbors) {
         this.neighbors = neighbors;
-    }
-
-    public long getTotalPopulation() {
-        return totalPopulation;
-    }
-
-    public void setTotalPopulation(long totalPopulation) {
-        this.totalPopulation = totalPopulation;
     }
 
     @Override

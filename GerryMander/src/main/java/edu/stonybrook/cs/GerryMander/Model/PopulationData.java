@@ -1,8 +1,8 @@
 package edu.stonybrook.cs.GerryMander.Model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import javax.persistence.*;
 
 @Entity
 public class PopulationData {
@@ -15,6 +15,7 @@ public class PopulationData {
     private int nativeAmerican;
     private int pacificIslander;
     private int other;
+    private Precinct precinct;
 
     @Id
     @GeneratedValue
@@ -88,5 +89,16 @@ public class PopulationData {
 
     public void setOther(int other) {
         this.other = other;
+    }
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "precinct_uid")
+    @JsonBackReference
+    public Precinct getPrecinct() {
+        return precinct;
+    }
+
+    public void setPrecinct(Precinct precinct) {
+        this.precinct = precinct;
     }
 }

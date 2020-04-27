@@ -1,15 +1,14 @@
 package edu.stonybrook.cs.GerryMander.Model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import javax.persistence.*;
 
 @Entity
 public class NeighborData {
     private long id;
-    private String precinct1;
-    private String preicnct2;
+    private Precinct precinct;
+    private String neighborID;
 
     @Id
     @GeneratedValue
@@ -21,19 +20,23 @@ public class NeighborData {
         this.id = id;
     }
 
-    public String getPrecinct1() {
-        return precinct1;
+
+    public String getNeighborID() {
+        return neighborID;
     }
 
-    public void setPrecinct1(String precinct1) {
-        this.precinct1 = precinct1;
+    public void setNeighborID(String neighborID) {
+        this.neighborID = neighborID;
     }
 
-    public String getPreicnct2() {
-        return preicnct2;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
+    public Precinct getPrecinct() {
+        return precinct;
     }
 
-    public void setPreicnct2(String preicnct2) {
-        this.preicnct2 = preicnct2;
+    public void setPrecinct(Precinct precinct) {
+        this.precinct = precinct;
     }
+
 }

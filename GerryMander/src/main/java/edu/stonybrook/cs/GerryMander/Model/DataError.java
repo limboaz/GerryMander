@@ -1,6 +1,7 @@
 package edu.stonybrook.cs.GerryMander.Model;
 
 import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.Set;
 
 @Entity

@@ -16,10 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/*
- * Last edit: Mel
- * Date: April 16, 2020
- */
 
 @RestController
 @RequestMapping("/data")
@@ -31,11 +27,11 @@ public class DataController {
     private DataService dataService;
 
     @GetMapping("/getprecinctsbycong")
-    public ResponseEntity<List<Precinct>> getPrecinctsByCong(@RequestParam String congressionalID){
+    public ResponseEntity<List<Precinct>> getPrecinctsByCong(@RequestParam long congressionalID){
         HttpStatus status = HttpStatus.OK;
         List<Precinct> result = dataService.getPrecinctsByCong(congressionalID);
         if (result.size() < 1){
-            status = HttpStatus.INTERNAL_SERVER_ERROR;
+            status = HttpStatus.NOT_FOUND;
             logger.error("getPrecinctsByCong: result size is 0.");
         }
 
@@ -47,7 +43,7 @@ public class DataController {
         HttpStatus status = HttpStatus.OK;
         List<CongressionalDistrict> result = dataService.getCongByState(state);
         if (result.size() < 1){
-            status = HttpStatus.INTERNAL_SERVER_ERROR;
+            status = HttpStatus.NOT_FOUND;
             logger.error("getCongByState: result size is 0.");
         }
 
@@ -66,17 +62,35 @@ public class DataController {
         return new ResponseEntity<>(result, status);
     }
 
-    /*
-     * NOTE: with this implementation, it is not necessary to request the precinct data from the backend,
-     * since it would've been retrieved when calling getPrecinctsByCong.
-     */
+    @GetMapping("/getstates")
+    public ResponseEntity<List<State>> getStates(){
+        HttpStatus status = HttpStatus.OK;
+        List<State> result = dataService.getStates();
+        if (result.size() < 1){
+            status = HttpStatus.NOT_FOUND;
+            logger.error("getStates: result is null.");
+        }
+
+        return new ResponseEntity<>(result, status);
+    }
+
+    @GetMapping("/getelectiondata")
+    public ResponseEntity<List<ElectionData>> getElectionData(@RequestParam String uid) {
+        HttpStatus status = HttpStatus.OK;
+        List<ElectionData> result = dataService.getElectionData(uid);
+        if (result.size() < 1) {
+            status = HttpStatus.NOT_FOUND;
+            logger.error("no election data");
+        }
+        return new ResponseEntity<>(result, status);
+    }
 
     @GetMapping("/geterrors")
     public ResponseEntity<List<Error>> getErrors(@RequestParam StatePostalCode state){
         HttpStatus status = HttpStatus.OK;
         List<Error> result = dataService.getErrors(state);
         if (result.size() < 1){
-            status = HttpStatus.INTERNAL_SERVER_ERROR;
+            status = HttpStatus.NOT_FOUND;
             logger.error("getErrors: result size is 0.");
         }
         return new ResponseEntity<>(result, status);
@@ -87,7 +101,7 @@ public class DataController {
         HttpStatus status = HttpStatus.OK;
         List<Correction> result = dataService.getCorrectionLog();
         if (result.size() < 1){
-            status = HttpStatus.INTERNAL_SERVER_ERROR;
+            status = HttpStatus.NOT_FOUND;
             logger.error("getCorrectionLog: result size is 0.");
         }
         return new ResponseEntity<>(result, status);

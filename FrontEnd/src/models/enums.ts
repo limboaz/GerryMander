@@ -1,0 +1,21 @@
+export enum StatePostalCode {
+  AZ, OH, WI
+}
+export enum ElectionType {
+  PRESIDENTIAL,
+  CONGRESSIONAL
+}
+export enum CandidateParty {
+  DEM, REP, IND, GRN, LIB
+}
+
+export enum ErrorType {
+  UNASSIGNED_AREA,
+  OVERLAPPING,
+  SELF_INTERSECTING,
+  ENCLOSED_PRECINCT,
+  MULTIPOLYGON,
+  ZERO_POPULATION,
+  ZERO_ELECTION_DATA,
+  VOTE_NOT_PROPORTIONAL_TO_POP
+}

@@ -1,7 +1,62 @@
-<app-info-sidenav></app-info-sidenav>
-<div class="map-container">
-  <div class="map-frame">
-    <div id="map">
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #drawer class="sidenav" fixedInViewport
+               [mode]="'over'"
+               [opened]="false">
+    <app-attribute-menu></app-attribute-menu>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <div class="sidenav-forms">
+      <mat-form-field color="accent" appearance="fill" id="search">
+        <input matInput placeholder="Search">
+        <button
+          type="button"
+          aria-label="Toggle sidenav"
+          mat-icon-button
+          matPrefix
+          (click)="drawer.toggle()">
+          <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+        </button>
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+      <mat-divider></mat-divider>
+      <app-error-list></app-error-list>
+      <mat-form-field class="drop-down">
+        <mat-label>State</mat-label>
+        <mat-select>
+          <mat-option *ngFor="let state of ['Arizona', 'Ohio', 'Wisconsin']" (click)="goToState(state)" [value]="state">
+            {{state}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
     </div>
-  </div>
-</div>
+    <app-info-sidenav></app-info-sidenav>
+    <div class="map-edit-buttons">
+      <button mat-icon-button aria-label="Combine precincts"
+              matTooltipPosition="before" matTooltip="Select and Merge two Precincts"
+              (click)="combiningPrecincts = true;">
+        <mat-icon>call_merge</mat-icon>
+      </button>
+      <button mat-icon-button
+              matTooltipPosition="before" matTooltip="Cancel combining precincts" *ngIf="combiningPrecincts"
+              (click)="cancelCombine()">
+        <mat-icon>clear</mat-icon>
+      </button>
+      <button mat-icon-button aria-label="Add new neighbor"
+              matTooltipPosition="before" matTooltip="Add Neighbor to Selected Precinct"
+              (click)="addingNeighbor = true;" *ngIf="selectedPrecinct">
+        <mat-icon>add_circle</mat-icon>
+      </button>
+      <button mat-icon-button
+              matTooltipPosition="before" matTooltip="Currently Adding Neighbor (Click here to cancel)"
+              *ngIf="addingNeighbor" (click)="cancelAdd()">
+        <mat-icon>clear</mat-icon>
+      </button>
+    </div>
+    <div class="map-container">
+      <div class="map-frame">
+        <div id="map">
+        </div>
+      </div>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

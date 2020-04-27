@@ -1,17 +1,14 @@
-import {AfterViewInit, Component, ViewChild, EventEmitter, Output} from '@angular/core';
+import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {forkJoin} from 'rxjs';
 import * as l from 'leaflet';
-import {precinctStyle, errorStyle} from './precinct.example';
-import * as statesGeoJSON from '../../assets/us_states_500K.json';
-import * as demographic from '../../assets/demographic.json';
-import * as comments from '../../assets/comments.json';
-import * as presidential from '../../assets/election_az.json';
-import {InfoSidenavComponent} from '../info-sidenav/info-sidenav.component';
-import {Demographic} from '../demographic.model';
 import {icon, Marker} from 'leaflet';
-import {MapService} from '../map.service';
-import {Candidate, ElectionData} from '../presidential.model';
+import {InfoSidenavComponent} from '../info-sidenav/info-sidenav.component';
+import {ErrorListComponent} from '../error-list/error-list.component';
+import {StatePostalCode} from '../../models/enums';
+import {CongressionalDistrict, Precinct, State, Error, ElectionData} from '../../models/models';
+import {districtStyle, precinctStyle, selectedStyle, stateStyle} from '../styles';
+import {addNeighbor, highlightNeighbors, mergePrecincts, resetNeighbors} from '../../PrecinctHelper';
+import {AttributeMenuComponent} from '../attribute-menu/attribute-menu.component';
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
@@ -28,181 +25,242 @@ const iconDefault = icon({
 });
 Marker.prototype.options.icon = iconDefault;
 
-const stateStyle = {
-  color: '#ff7800',
-  weight: 5,
-  opacity: 0.65
-};
-
-const districtStyle = {
-  color: '#ff95f8',
-  weight: 2,
-  opacity: 0.65
-};
-
-const states = (statesGeoJSON as any).features
-  .filter(e => ['WI', 'AZ', 'OH'].includes(e.properties.STUSPS))
-  .map(e => {
-    const s = l.geoJSON(e, {style: stateStyle});
-    s.STUSPS = e.properties.STUSPS;
-    s.NAME = e.properties.NAME;
-    return s;
-  });
-
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css']
 })
-
 export class MapComponent implements AfterViewInit {
   public map;
-  public exampleLayerGroup;
-  @Output() notify = new EventEmitter();
+  public districtsLayer = l.layerGroup();
+  public currentDistrictsPrecincts = {districtNum: -1, precincts: [], layerGroup: l.layerGroup()};
+  public mapControl;
+  public marker;
+  public stateCache = {};
+  public stateToLayer = {};
+  public uidToPrecinctMap = {};
+  public addingNeighbor: boolean;
+  public combiningPrecincts: boolean;
+  public selectedPrecinct: Precinct;
+
   @ViewChild(InfoSidenavComponent)
   public infoSidenav: InfoSidenavComponent;
+  @ViewChild(ErrorListComponent)
+  public errorList: ErrorListComponent;
+  @ViewChild(AttributeMenuComponent)
+  public attrMenu: AttributeMenuComponent;
 
-
-  constructor(private http: HttpClient, private mapService: MapService) {
-    this.exampleLayerGroup = this.mapService.exampleLayerGroup;
-  }
-
-  exampleOnClick(layer) {
-    this.notify.emit(layer.wrapperPrecinct);
+  constructor(private http: HttpClient) {
   }
 
   ngAfterViewInit(): void {
-    this.map = this.mapService.currentMap.subscribe(map => this.map = map);
-    this.mapService.init();
-    // const az = this.http.get('assets/arizona.json');
-    const wi = this.http.get('assets/wi_example.json');
-    const oh = this.http.get('assets/oh_example.json');
-    const az = this.http.get('assets/az_example.json');
-    const districts = this.http.get('assets/congressional_districts.json');
-    const realAz = this.http.get('assets/arizona.json');
-    const httpRequest = forkJoin([az, wi, oh, districts, realAz]);
-    const demographicData = new Demographic();
-    this.infoSidenav.demographicGroups = demographicData;
-    const statesLayer = l.layerGroup(states); // Layer to show the state borders
-
-    statesLayer.addTo(this.map);
-    this.exampleLayerGroup.eachLayer(layer => layer.on('click', e => this.exampleOnClick(layer)));
+    const tiles = l.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; '
+        + '<a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 19,
+      minZoom: 5
+    });
+    this.map = l.map('map', {
+      center: [39.8282, -98.5795],
+      zoom: 5,
+      zoomControl: false
+    });
+    this.errorList.map = this.map;
+    tiles.addTo(this.map);
     l.control.zoom({position: 'bottomright'}).addTo(this.map);
-    const marker = l.marker([0, 0]).addTo(this.map);
-    marker.on('click', e => this.infoSidenav.toggle());
-    const onMapClick = (feature, layer) => {
-      let presidentialData;
-      const congressionalData = [];
-      for (const year of presidential.Years) {
-        if (year.presidential) {
-          const presidentialCandidates = [];
-          for (const precinctElection of year.presidential) {
-            if (precinctElection.uid === feature.properties.uid) {
-              for (const candidate of precinctElection.candidates) {
-                presidentialCandidates.push(new Candidate(candidate));
-              }
-              break;
-            }
-          }
-          presidentialData = new ElectionData(presidentialCandidates, 'presidential', year.year, feature.properties.uid);
-        }
-        const congressionalCandidates = [];
-        for (const precinctElection of year.congressional) {
-          if (precinctElection.uid === feature.properties.uid) {
-            for (const candidate of precinctElection.candidates) {
-              congressionalCandidates.push(new Candidate(candidate));
-            }
-            break;
-          }
-        }
-        congressionalData.push(new ElectionData(congressionalCandidates, 'congressional', year.year, feature.properties.uid));
-      }
-      return e => {
-        marker.setLatLng(e.latlng);
-        // load the info of this feature to infoSidenav here
-        this.infoSidenav.comment = '';
-        this.infoSidenav.presidentialData = presidentialData;
-        this.infoSidenav.congressionalData = congressionalData;
-        for (const precinct of demographic.precincts) {
-          if (precinct.uid === feature.properties.uid) {
-            demographicData.setData(precinct.uid, precinct.total, precinct.white, precinct.black,
-              precinct.asian, precinct.hawaiian, precinct.others);
-          }
-        }
-        for (const comment of comments.comments) {
-          if (comment.uid === feature.properties.uid) {
-            this.infoSidenav.comment = comment.comment;
-          }
-        }
-      };
-    };
-    const onMouseOver = (feature, layer) => {
-      return e => layer.bindTooltip(feature.properties.name).openTooltip();
-    };
-    const onEachFeature = (feature, layer) => {
-      if (feature.properties.hasError) {
-        layer.setStyle(errorStyle);
-      }
-      layer.on({
-        click: onMapClick(feature, layer),
-        mouseover: onMouseOver(feature, layer)
+    this.marker = l.marker([0, 0]).addTo(this.map);
+    this.marker.on('click', () => this.infoSidenav.sidenav.toggle());
+
+    this.http.get<State[]>('/data/getstates').subscribe((states: State[]) => {
+      const statesLayer = l.layerGroup();
+
+      states.forEach((s) => {
+        const layer = l.geoJSON(JSON.parse(s.stateGeoJSON), {style: stateStyle});
+        statesLayer.addLayer(layer);
+        this.stateToLayer[s.name] = layer;
+        layer.on('click', this.onStateClick(statesLayer, s.state));
       });
-    };
 
-    httpRequest.subscribe(data => {
-      const statePrecinctsData = [data[0] as any, data[1] as any, data[2] as any];
-      const congressionalDistricts = data[3] as any;
-      const statePrecincts = {
-        AZ: l.geoJSON(statePrecinctsData[0], {style: precinctStyle, onEachFeature}),
-        WI: l.geoJSON(statePrecinctsData[1], {style: precinctStyle, onEachFeature}),
-        OH: l.geoJSON(statePrecinctsData[2], {style: precinctStyle, onEachFeature})
-      };
-      const precinctsLayer = [statePrecincts.AZ, statePrecincts.OH, statePrecincts.WI];
-      let districtsLayer = [];
-      const realAzLayer = l.geoJSON(data[4], {style: precinctStyle});
-      for (const key in congressionalDistricts) {
-        if (!congressionalDistricts.hasOwnProperty(key)) {
-          continue;
-        }
-        const district = l.geoJSON(congressionalDistricts[key], {style: districtStyle});
-        district.on('click', e => {
-          this.map.setView(e.latlng, 9);
-          if (key === 'AZ') {
-            this.map.addLayer(realAzLayer);
-          }
-          this.map.addLayer(statePrecincts[key]);
-        });
-        districtsLayer.push(district);
-      }
-      districtsLayer = l.layerGroup(districtsLayer);
-
-      for (const s of states) {
-        s.on('click', e => {
-          this.map.setView(e.latlng, 7);
-          this.map.removeLayer(statesLayer);
-          this.map.addLayer(districtsLayer);
-        });
-      }
+      statesLayer.addTo(this.map);
 
       this.map.on('zoomend', e => { // Change which layer is visible based on how zoomed in the map is
-        if (this.map.getZoom() <= 5.5) {
-          this.map.removeLayer(districtsLayer);
-          this.map.addLayer(statesLayer);
-        } else if (this.map.getZoom() <= 8) {
-          precinctsLayer.forEach(layer => this.map.removeLayer(layer));
-          this.map.removeLayer(realAzLayer);
+        if (this.map.getZoom() < 7) {
+          if (this.currentDistrictsPrecincts.layerGroup.getLayers().length > 0) {
+            this.map.removeLayer(this.currentDistrictsPrecincts.layerGroup);
+          }
+          this.map.removeLayer(this.districtsLayer);
         }
       });
-
-      l.control.layers({}, {
+      this.mapControl = l.control.layers({}, {
         States: statesLayer,
-        'Congressional Districts': districtsLayer,
-        'Example Layer': this.exampleLayerGroup,
-        'Real Arizona' : realAzLayer
-      }).addTo(this.map);
-    }, error => {
-      l.control.layers({}, {States: statesLayer, 'Example Layer': this.exampleLayerGroup}).addTo(this.map);
-      console.log('error retrieving boundaries', error);
+        Districts: this.districtsLayer,
+        Error: this.errorList.errorsLayer,
+        Precincts: this.currentDistrictsPrecincts.layerGroup
+      });
+      this.mapControl.addTo(this.map);
     });
+  }
+
+  getCongressionalDistricts(state: StatePostalCode): void {
+    if (this.stateCache[state]) {
+      if (!this.map.hasLayer(this.districtsLayer)) {
+        this.map.addLayer(this.districtsLayer);
+      }
+      return;
+    }
+
+    this.http.get<CongressionalDistrict[]>(`/data/getcongbystate?state=${state}`)
+      .subscribe((congressionalDistricts: CongressionalDistrict[]) => {
+        console.log(congressionalDistricts);
+        // alternatively display all the precinct boundaries at this point instead of district ones
+        const districtGeoJSONs = congressionalDistricts.map(d => {
+          d.congressionalDistrictGeoJSON = JSON.parse(d.congressionalDistrictGeoJSON);
+          d.congressionalDistrictGeoJSON.properties = {districtNum: d.id};
+          return d.congressionalDistrictGeoJSON;
+        });
+
+        const onEachDistrictFeature = (feature, layer) => {
+          layer.on('click', e => {
+            console.log(feature.properties.districtNum);
+            this.getPrecincts(feature.properties.districtNum);
+          });
+        };
+        const district = l.geoJSON(districtGeoJSONs, {style: districtStyle, onEachFeature: onEachDistrictFeature});
+
+        this.districtsLayer.addLayer(district);
+        this.stateCache[state] = congressionalDistricts;
+        this.map.addLayer(this.districtsLayer);
+      });
+  }
+
+  getErrors(state: StatePostalCode) {
+    this.http.get<Error[]>(`/data/geterrors?state=${state}`).subscribe((errors: Error[]) => {
+      this.errorList.addErrors(errors);
+    });
+  }
+
+  onStateClick(statesLayer, state: StatePostalCode) {
+    return e => {
+      this.map.setView(e.latlng, 7);
+      this.getCongressionalDistricts(state);
+      this.getErrors(state);
+    };
+  }
+
+  onPrecinctClick(feature, layer) {
+    return (e) => {
+      // load the info of this feature to infoSidenav here
+      this.marker.setLatLng(e.latlng);
+      this.getPrecinctData(layer.wrapperPrecinct, feature.properties.uid);
+    };
+  }
+
+  onPrecinctMouseOver(feature, layer) {
+    return () => layer.bindTooltip('Name: ' + layer.wrapperPrecinct.name
+      + ' Total Population: ' + layer.wrapperPrecinct.populationData.total).openTooltip();
+  }
+
+  getPrecincts(districtNum: number): void {
+    if (this.currentDistrictsPrecincts) {
+      if (this.currentDistrictsPrecincts.districtNum === districtNum) {
+        this.map.addLayer(this.currentDistrictsPrecincts.layerGroup);
+        return;
+      }
+
+      this.map.removeLayer(this.currentDistrictsPrecincts.layerGroup);
+    }
+
+    this.http.get<Precinct[]>(`/data/getprecinctsbycong?congressionalID=${districtNum}`)
+      .subscribe((precincts: Precinct[]) => {
+        this.uidToPrecinctMap = {};
+        const precinctLayers = precincts.map(p => {
+          p.precinctGeoJSON = JSON.parse(p.precinctGeoJSON);
+          p.precinctGeoJSON.properties = {uid: p.uid};
+          const precinctLayer = l.geoJSON(p.precinctGeoJSON, {style: precinctStyle});
+          p.layer = precinctLayer;
+          precinctLayer.wrapperPrecinct = p;
+          precinctLayer.on({
+            click: this.onPrecinctClick(p.precinctGeoJSON, precinctLayer),
+            mouseover: this.onPrecinctMouseOver(p.precinctGeoJSON, precinctLayer)
+          });
+          this.uidToPrecinctMap[p.uid] = p;
+          return precinctLayer;
+        });
+        this.currentDistrictsPrecincts.districtNum = districtNum;
+        this.currentDistrictsPrecincts.precincts = precincts;
+        this.currentDistrictsPrecincts.layerGroup.clearLayers();
+        this.currentDistrictsPrecincts.layerGroup.addLayer(l.layerGroup(precinctLayers));
+        this.map.addLayer(this.currentDistrictsPrecincts.layerGroup);
+      });
+  }
+
+  getPrecinctData(wrapperPrecinct: Precinct, uid: string) {
+    this.selectPrecinct(wrapperPrecinct);
+
+    if (this.uidToPrecinctMap[uid].populationData) {
+      this.infoSidenav.populationData = this.uidToPrecinctMap[uid].populationData;
+    }
+
+    if (this.uidToPrecinctMap[uid].electionData) {
+      this.infoSidenav.addElectionData(this.uidToPrecinctMap[uid].electionData);
+      return;
+    }
+    this.http.get<ElectionData[]>(`/data/getelectiondata?uid=${uid}`)
+      .subscribe((electionData: ElectionData[]) => {
+        this.uidToPrecinctMap[uid].electionData = electionData;
+        this.infoSidenav.addElectionData(this.uidToPrecinctMap[uid].electionData);
+      });
+  }
+
+  selectPrecinct(precinct: Precinct) {
+    if (this.combiningPrecincts) {
+      if (this.selectedPrecinct) {
+        const combined = mergePrecincts(this.selectedPrecinct, precinct);
+        if (combined) {
+          combined.layer.addTo(this.map);
+          combined.layer.on('click', this.onPrecinctClick(combined.precinctGeoJSON, combined.layer));
+          resetNeighbors(combined, this.currentDistrictsPrecincts);
+          this.map.removeLayer(this.selectedPrecinct.layer);
+          this.map.removeLayer(precinct.layer);
+
+          this.selectedPrecinct = undefined;
+          this.combiningPrecincts = false;
+        }
+      } else {
+        this.selectedPrecinct = precinct;
+        this.selectedPrecinct.layer.setStyle(selectedStyle);
+      }
+    } else if (this.addingNeighbor) {
+      addNeighbor(this.selectedPrecinct, precinct);
+      this.addingNeighbor = false;
+      resetNeighbors(this.selectedPrecinct, this.currentDistrictsPrecincts);
+      highlightNeighbors(this.selectedPrecinct, this.currentDistrictsPrecincts);
+    } else {
+      if (this.selectedPrecinct) {
+        this.selectedPrecinct.layer.resetStyle();
+        resetNeighbors(this.selectedPrecinct, this.currentDistrictsPrecincts);
+      } // a comment
+      if (this.selectedPrecinct !== precinct) {
+        this.selectedPrecinct = precinct;
+        this.selectedPrecinct.layer.setStyle(selectedStyle);
+        highlightNeighbors(this.selectedPrecinct, this.currentDistrictsPrecincts);
+      } else {
+        this.selectedPrecinct = undefined;
+      }
+    }
+  }
+
+  cancelAdd() {
+    this.addingNeighbor = false;
+  }
+
+  cancelCombine() {
+    this.combiningPrecincts = false;
+    this.selectedPrecinct = undefined;
+  }
+
+  goToState(state: string) {
+    this.map.fitBounds(this.stateToLayer[state].getBounds());
   }
 }

@@ -1,18 +1,22 @@
 <mat-accordion>
-  <mat-expansion-panel [ngSwitch]="error.feature.properties.error.type" *ngFor="let error of currentErrors" class="expansion-panel">
-    <mat-expansion-panel-header (click)="goToError(error)">
+  <mat-expansion-panel *ngFor="let errorType of errorKeys" class="expansion-panel">
+    <mat-expansion-panel-header>
       <mat-panel-title>
-        {{error.feature.properties.error.description}}
+        {{errorType}}
       </mat-panel-title>
       <mat-panel-description>
-        Click to view options to correct
       </mat-panel-description>
     </mat-expansion-panel-header>
-    <button mat-button *ngSwitchCase="'MISSING'" (click)="addMissingNeighbor(error)">
-      Add Missing Neighbor
-    </button>
-    <button mat-button *ngSwitchCase="'GHOST'" (click)="combineEvent.emit(error)">
-      Click to combine with another precinct
-    </button>
+
+    <div *ngIf="currentErrors[errorType]">
+      <mat-expansion-panel *ngFor="let error of currentErrors[errorType]">
+        <mat-expansion-panel-header (click)="goToError(error)">
+          <mat-panel-title>
+            ID: {{error.id}}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        Data Source: <a href="https://{{error.dataSource}}" target="_blank">{{error.dataSource}}</a>
+      </mat-expansion-panel>
+    </div>
   </mat-expansion-panel>
 </mat-accordion>
