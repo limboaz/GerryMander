@@ -44,7 +44,7 @@ def get_district(bdy, state):
     districts = df_c[df_c['STATE']==state]
     precinct_bdy = shape(bdy)
     for district in districts.index:
-        jsonify = districts.at[district, 'BDY'].replace("\'", "\"")
+        jsonify = districts.at[district, 'BDY']
         poly_district = json.loads(jsonify)
         poly_district = shape(poly_district["geometry"])
         if precinct_bdy.within(poly_district):
@@ -65,7 +65,7 @@ with open("../raw_data/GeoJSON/arizona.json") as f:
             "County": county,
             "Precinct": precinct_na,
             "District": get_district(precinct["geometry"], state_po),
-            "BDY": precinct
+            "BDY": str(precinct).replace("\'", "\"")
         })
         if precinct["geometry"]["type"] == "MultiPolygon":
             errors.append({
