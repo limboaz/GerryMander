@@ -8,9 +8,9 @@ import java.util.HashSet;
 
 @Entity
 public class BoundaryError extends Error {
-    @Lob
     private String errorBoundaryGeoJSON;
 
+    @Lob
     public String getErrorBoundaryGeoJSON() {
         return errorBoundaryGeoJSON;
     }

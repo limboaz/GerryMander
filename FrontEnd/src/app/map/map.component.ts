@@ -33,8 +33,7 @@ Marker.prototype.options.icon = iconDefault;
 export class MapComponent implements AfterViewInit {
   public map;
   public districtsLayer = l.layerGroup();
-  public currentStatePrecincts;
-  public currentDistrictsPrecincts;
+  public currentDistrictsPrecincts = {districtNum: -1, precincts: [], layerGroup: l.layerGroup()};
   public mapControl;
   public marker;
   public stateCache = {};
@@ -86,23 +85,28 @@ export class MapComponent implements AfterViewInit {
       statesLayer.addTo(this.map);
 
       this.map.on('zoomend', e => { // Change which layer is visible based on how zoomed in the map is
-        if (this.map.getZoom() <= 5.5) {
-          this.map.removeLayer(this.districtsLayer);
-          this.map.addLayer(statesLayer);
-        } else if (this.map.getZoom() <= 8) {
-          if (this.currentDistrictsPrecincts) {
+        if (this.map.getZoom() < 7) {
+          if (this.currentDistrictsPrecincts.layerGroup.getLayers().length > 0) {
             this.map.removeLayer(this.currentDistrictsPrecincts.layerGroup);
           }
+          this.map.removeLayer(this.districtsLayer);
         }
       });
-      this.mapControl = l.control.layers({}, {States: statesLayer});
+      this.mapControl = l.control.layers({}, {
+        States: statesLayer,
+        Districts: this.districtsLayer,
+        Error: this.errorList.errorsLayer,
+        Precincts: this.currentDistrictsPrecincts.layerGroup
+      });
       this.mapControl.addTo(this.map);
     });
   }
 
   getCongressionalDistricts(state: StatePostalCode): void {
     if (this.stateCache[state]) {
-      this.map.addLayer(this.districtsLayer);
+      if (!this.map.hasLayer(this.districtsLayer)) {
+        this.map.addLayer(this.districtsLayer);
+      }
       return;
     }
 
@@ -112,13 +116,13 @@ export class MapComponent implements AfterViewInit {
         // alternatively display all the precinct boundaries at this point instead of district ones
         const districtGeoJSONs = congressionalDistricts.map(d => {
           d.congressionalDistrictGeoJSON = JSON.parse(d.congressionalDistrictGeoJSON);
-          d.congressionalDistrictGeoJSON.properties = {districtNum: d.districtNum};
+          d.congressionalDistrictGeoJSON.properties = {districtNum: d.id};
           return d.congressionalDistrictGeoJSON;
         });
 
         const onEachDistrictFeature = (feature, layer) => {
           layer.on('click', e => {
-            this.map.setView(e.latlng, 9);
+            console.log(feature.properties.districtNum);
             this.getPrecincts(feature.properties.districtNum);
           });
         };
@@ -127,13 +131,12 @@ export class MapComponent implements AfterViewInit {
         this.districtsLayer.addLayer(district);
         this.stateCache[state] = congressionalDistricts;
         this.map.addLayer(this.districtsLayer);
-        this.mapControl.addOverlay(this.districtsLayer, 'Districts');
       });
   }
 
   getErrors(state: StatePostalCode) {
     this.http.get<Error[]>(`/data/geterrors?state=${state}`).subscribe((errors: Error[]) => {
-      this.mapControl.addOverlay(this.errorList.addErrors(errors), 'Errors');
+      this.errorList.addErrors(errors);
     });
   }
 
@@ -184,28 +187,29 @@ export class MapComponent implements AfterViewInit {
           this.uidToPrecinctMap[p.uid] = p;
           return precinctLayer;
         });
-        this.currentDistrictsPrecincts = {
-          districtNum,
-          precincts,
-          layerGroup: l.layerGroup(precinctLayers)
-        };
-        this.mapControl.addOverlay(this.currentDistrictsPrecincts.layerGroup, 'Precincts');
+        this.currentDistrictsPrecincts.districtNum = districtNum;
+        this.currentDistrictsPrecincts.precincts = precincts;
+        this.currentDistrictsPrecincts.layerGroup.clearLayers();
+        this.currentDistrictsPrecincts.layerGroup.addLayer(l.layerGroup(precinctLayers));
         this.map.addLayer(this.currentDistrictsPrecincts.layerGroup);
       });
   }
 
   getPrecinctData(wrapperPrecinct: Precinct, uid: string) {
-    if (this.uidToPrecinctMap[uid].electionData) {
-      this.infoSidenav.addData(this.uidToPrecinctMap[uid].populationData, this.uidToPrecinctMap[uid].electionData);
-      this.selectPrecinct(wrapperPrecinct);
-      return;
+    this.selectPrecinct(wrapperPrecinct);
+
+    if (this.uidToPrecinctMap[uid].populationData) {
+      this.infoSidenav.populationData = this.uidToPrecinctMap[uid].populationData;
     }
 
+    if (this.uidToPrecinctMap[uid].electionData) {
+      this.infoSidenav.addElectionData(this.uidToPrecinctMap[uid].electionData);
+      return;
+    }
     this.http.get<ElectionData[]>(`/data/getelectiondata?uid=${uid}`)
       .subscribe((electionData: ElectionData[]) => {
         this.uidToPrecinctMap[uid].electionData = electionData;
-        this.infoSidenav.addData(this.uidToPrecinctMap[uid].populationData, this.uidToPrecinctMap[uid].electionData);
-        this.selectPrecinct(wrapperPrecinct);
+        this.infoSidenav.addElectionData(this.uidToPrecinctMap[uid].electionData);
       });
   }
 

@@ -31,6 +31,10 @@ export class ErrorListComponent implements OnInit {
   }
 
   addErrors(errors: Error[]) {
+    this.errorsLayer.clearLayers();
+    for (const errorType of this.errorKeys) {
+      this.currentErrors[errorType] = [];
+    }
     for (const error of errors) {
       if (error.errorBoundaryGeoJSON) {
         error.errorBoundaryGeoJSON = JSON.parse(error.errorBoundaryGeoJSON);
@@ -43,7 +47,6 @@ export class ErrorListComponent implements OnInit {
         this.currentErrors[error.type] = [error];
       }
     }
-    console.log(this.currentErrors);
     return this.errorsLayer;
   }
 }

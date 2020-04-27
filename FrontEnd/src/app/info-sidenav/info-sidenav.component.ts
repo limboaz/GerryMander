@@ -34,7 +34,7 @@ export class InfoSidenavComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  addData(populationData: PopulationData, electionData: ElectionData[]) {
+  addElectionData(electionData: ElectionData[]) {
     const congressionalData = electionData.filter(e => e.type.toString() === ElectionType[ElectionType.CONGRESSIONAL]);
     const congressionalDataDictionary = {};
 
@@ -48,7 +48,6 @@ export class InfoSidenavComponent implements OnInit {
 
     this.congressionalData = congressionalDataDictionary;
     this.presidentialData = electionData.filter(e => e.type.toString() === ElectionType[ElectionType.PRESIDENTIAL]);
-    this.populationData = populationData;
     this.sidenav.open();
   }
 }

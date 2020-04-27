@@ -5,9 +5,9 @@ export const stateStyle = {
 };
 
 export const districtStyle = {
-  color: '#ff95f8',
+  color: '#ff315f',
   weight: 2,
-  opacity: 0.65
+  opacity: 0.65,
 };
 
 export const precinctStyle = {
