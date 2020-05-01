@@ -106,4 +106,9 @@ public class DataController {
         }
         return new ResponseEntity<>(result, status);
     }
+
+    @GetMapping(value = "/getnationalparksdata", produces = "application/zip")
+    public byte[] getNationalParksData() {
+        return DataService.nationalParksData;
+    }
 }

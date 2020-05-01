@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import * as l from 'leaflet';
+import * as L from 'leaflet';
 import {icon, Marker} from 'leaflet';
 import {InfoSidenavComponent} from '../info-sidenav/info-sidenav.component';
 import {ErrorListComponent} from '../error-list/error-list.component';
@@ -9,6 +9,7 @@ import {CongressionalDistrict, Precinct, State, Error, ElectionData} from '../..
 import {districtStyle, precinctStyle, selectedStyle, stateStyle} from '../styles';
 import {addNeighbor, highlightNeighbors, mergePrecincts, resetNeighbors} from '../../PrecinctHelper';
 import {AttributeMenuComponent} from '../attribute-menu/attribute-menu.component';
+import './leaflet.shpfile';
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
@@ -32,12 +33,11 @@ Marker.prototype.options.icon = iconDefault;
 })
 export class MapComponent implements AfterViewInit {
   public map;
-  public districtsLayer = l.layerGroup();
-  public currentDistrictsPrecincts = {districtNum: -1, precincts: [], layerGroup: l.layerGroup()};
+  public districtsLayer = L.layerGroup();
+  public currentDistrictsPrecincts = {districtNum: -1, precincts: [], layerGroup: L.layerGroup()};
   public mapControl;
   public marker;
   public stateCache = {};
-  public stateToLayer = {};
   public uidToPrecinctMap = {};
   public addingNeighbor: boolean;
   public combiningPrecincts: boolean;
@@ -54,31 +54,32 @@ export class MapComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    const tiles = l.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    const tiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; '
         + '<a href="https://carto.com/attributions">CARTO</a>',
       subdomains: 'abcd',
       maxZoom: 19,
       minZoom: 5
     });
-    this.map = l.map('map', {
+    this.map = L.map('map', {
       center: [39.8282, -98.5795],
       zoom: 5,
       zoomControl: false
     });
     this.errorList.map = this.map;
     tiles.addTo(this.map);
-    l.control.zoom({position: 'bottomright'}).addTo(this.map);
-    this.marker = l.marker([0, 0]).addTo(this.map);
+    L.control.zoom({position: 'bottomright'}).addTo(this.map);
+    this.marker = L.marker([0, 0]).addTo(this.map);
     this.marker.on('click', () => this.infoSidenav.sidenav.toggle());
 
     this.http.get<State[]>('/data/getstates').subscribe((states: State[]) => {
-      const statesLayer = l.layerGroup();
+      const statesLayer = L.layerGroup();
 
       states.forEach((s) => {
-        const layer = l.geoJSON(JSON.parse(s.stateGeoJSON), {style: stateStyle});
+        const layer = L.geoJSON(JSON.parse(s.stateGeoJSON), {style: stateStyle});
         statesLayer.addLayer(layer);
-        this.stateToLayer[s.name] = layer;
+        this.stateCache[s.state] = s;
+        s.layer = layer;
         layer.on('click', this.onStateClick(statesLayer, s.state));
       });
 
@@ -92,18 +93,23 @@ export class MapComponent implements AfterViewInit {
           this.map.removeLayer(this.districtsLayer);
         }
       });
-      this.mapControl = l.control.layers({}, {
+      this.mapControl = L.control.layers({}, {
         States: statesLayer,
         Districts: this.districtsLayer,
         Error: this.errorList.errorsLayer,
         Precincts: this.currentDistrictsPrecincts.layerGroup
       });
       this.mapControl.addTo(this.map);
+
+      this.http.get('/data/getnationalparksdata', {responseType: 'arraybuffer'}).subscribe(d => {
+        const parksLayer = new L.Shapefile(d);
+        this.mapControl.addOverlay(parksLayer, 'National Parks');
+      });
     });
   }
 
   getCongressionalDistricts(state: StatePostalCode): void {
-    if (this.stateCache[state]) {
+    if (this.stateCache[state].congressionalDistricts) {
       if (!this.map.hasLayer(this.districtsLayer)) {
         this.map.addLayer(this.districtsLayer);
       }
@@ -126,10 +132,10 @@ export class MapComponent implements AfterViewInit {
             this.getPrecincts(feature.properties.districtNum);
           });
         };
-        const district = l.geoJSON(districtGeoJSONs, {style: districtStyle, onEachFeature: onEachDistrictFeature});
+        const district = L.geoJSON(districtGeoJSONs, {style: districtStyle, onEachFeature: onEachDistrictFeature});
 
         this.districtsLayer.addLayer(district);
-        this.stateCache[state] = congressionalDistricts;
+        this.stateCache[state].congressionalDistricts = congressionalDistricts;
         this.map.addLayer(this.districtsLayer);
       });
   }
@@ -177,7 +183,7 @@ export class MapComponent implements AfterViewInit {
         const precinctLayers = precincts.map(p => {
           p.precinctGeoJSON = JSON.parse(p.precinctGeoJSON);
           p.precinctGeoJSON.properties = {uid: p.uid};
-          const precinctLayer = l.geoJSON(p.precinctGeoJSON, {style: precinctStyle});
+          const precinctLayer = L.geoJSON(p.precinctGeoJSON, {style: precinctStyle});
           p.layer = precinctLayer;
           precinctLayer.wrapperPrecinct = p;
           precinctLayer.on({
@@ -190,7 +196,7 @@ export class MapComponent implements AfterViewInit {
         this.currentDistrictsPrecincts.districtNum = districtNum;
         this.currentDistrictsPrecincts.precincts = precincts;
         this.currentDistrictsPrecincts.layerGroup.clearLayers();
-        this.currentDistrictsPrecincts.layerGroup.addLayer(l.layerGroup(precinctLayers));
+        this.currentDistrictsPrecincts.layerGroup.addLayer(L.layerGroup(precinctLayers));
         this.map.addLayer(this.currentDistrictsPrecincts.layerGroup);
       });
   }
@@ -240,7 +246,7 @@ export class MapComponent implements AfterViewInit {
       if (this.selectedPrecinct) {
         this.selectedPrecinct.layer.resetStyle();
         resetNeighbors(this.selectedPrecinct, this.currentDistrictsPrecincts);
-      } // a comment
+      }
       if (this.selectedPrecinct !== precinct) {
         this.selectedPrecinct = precinct;
         this.selectedPrecinct.layer.setStyle(selectedStyle);
@@ -260,7 +266,9 @@ export class MapComponent implements AfterViewInit {
     this.selectedPrecinct = undefined;
   }
 
-  goToState(state: string) {
-    this.map.fitBounds(this.stateToLayer[state].getBounds());
+  goToState(state: StatePostalCode) {
+    this.map.fitBounds(this.stateCache[state].layer.getBounds());
+    this.getCongressionalDistricts(state);
+    this.getErrors(state);
   }
 }

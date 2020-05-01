@@ -23,7 +23,7 @@
       <mat-form-field class="drop-down">
         <mat-label>State</mat-label>
         <mat-select>
-          <mat-option *ngFor="let state of ['Arizona', 'Ohio', 'Wisconsin']" (click)="goToState(state)" [value]="state">
+          <mat-option *ngFor="let state of ['AZ', 'OH', 'WI']" (click)="goToState(state)" [value]="state">
             {{state}}
           </mat-option>
         </mat-select>

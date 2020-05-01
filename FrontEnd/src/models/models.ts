@@ -64,4 +64,5 @@ export interface State {
   congressionalDistricts: CongressionalDistrict[];
   errors: Error[];
   stateGeoJSON;
+  layer;
 }

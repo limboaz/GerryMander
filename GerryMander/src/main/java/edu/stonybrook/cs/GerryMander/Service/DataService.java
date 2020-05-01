@@ -9,12 +9,24 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 
 @Service
 public class DataService {
+
+    public static byte[] nationalParksData;
+
+    static {
+        try {
+            nationalParksData = new FileInputStream("nps_boundary.zip").readAllBytes();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @PersistenceContext
     private EntityManager em;
