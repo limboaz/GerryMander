@@ -29,8 +29,27 @@
               }
             ],
             "styles": [
-              "./node_modules/@angular/material/prebuilt-themes/pink-bluegrey.css",
-              "src/styles.css"
+              "src/styles.css",
+              {
+                "inject": false,
+                "input": "src/assets/pink-bluegrey.css",
+                "bundleName": "pink-bluegrey"
+              },
+              {
+                "inject": false,
+                "input": "src/assets/deeppurple-amber.css",
+                "bundleName": "deeppurple-amber"
+              },
+              {
+                "inject": false,
+                "input": "src/assets/indigo-pink.css",
+                "bundleName": "indigo-pink"
+              },
+              {
+                "inject": false,
+                "input": "src/assets/purple-green.css",
+                "bundleName": "purple-green"
+              }
             ],
             "scripts": []
           },
@@ -95,7 +114,6 @@
               "src/assets"
             ],
             "styles": [
-              "./node_modules/@angular/material/prebuilt-themes/pink-bluegrey.css",
               "src/styles.css"
             ],
             "scripts": []
