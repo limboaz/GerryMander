@@ -1,7 +1,7 @@
 <mat-sidenav class="sidenav" fixedInViewport
              [mode]="'over'"
              [opened]="false">
-  <mat-accordion>
+  <mat-accordion multi="true">
     <mat-expansion-panel>
       <mat-expansion-panel-header>
         <mat-panel-title>
@@ -11,7 +11,7 @@
           Presidential and Congressional Elections
         </mat-panel-description>
       </mat-expansion-panel-header>
-      <mat-accordion>
+      <mat-accordion multi="true">
         <mat-expansion-panel *ngIf="presidentialData">
           <mat-expansion-panel-header>
             <mat-panel-title>
@@ -27,13 +27,13 @@
                 {{candidate.candidate}}
               </mat-panel-title>
               <mat-panel-description>
-                Total Votes: {{candidate.voteTotal}}
+                Total Votes: {{candidate.voteTotal.toLocaleString()}}
               </mat-panel-description>
             </mat-expansion-panel-header>
             <div style="display: flex; flex-direction: column">
-                <mat-label>Total Votes: {{candidate.voteTotal}}</mat-label>
+                <mat-label>Total Votes: {{candidate.voteTotal.toLocaleString()}}</mat-label>
                 <app-dialog-button [fieldValue]="candidate.voteTotal" [fieldName]='"Total Votes"'
-                                   (valueChange)="candidate.voteTotal = $event">
+                                   (valueChange)="candidate.voteTotal = Number($event)">
                 </app-dialog-button>
               </div>
           </mat-expansion-panel>
@@ -45,7 +45,7 @@
               Congressional Elections
             </mat-panel-title>
           </mat-expansion-panel-header>
-          <mat-accordion>
+          <mat-accordion multi="true">
             <mat-expansion-panel *ngFor="let year of [2016, 2018]">
               <mat-expansion-panel-header>
                 <mat-panel-title>
@@ -71,6 +71,10 @@
             </mat-expansion-panel>
           </mat-accordion>
         </mat-expansion-panel>
+
+        <button mat-raised-button color="accent" (click)="commitElectionData()">
+          Commit Changes
+        </button>
       </mat-accordion>
     </mat-expansion-panel>
 
@@ -85,12 +89,16 @@
       </mat-expansion-panel-header>
       <mat-list>
         <mat-list-item *ngFor="let key of populationKeys">
-          <mat-label>{{populationLabels[key]}}: {{populationData[key]}}</mat-label>
+          <mat-label>{{populationLabels[key]}}: {{populationData[key].toLocaleString()}}</mat-label>
           <app-dialog-button [fieldValue]="populationData[key]" [fieldName]="populationLabels[key]"
-                             (valueChange)="populationData[key] = $event">
+                             (valueChange)="populationData[key] = Number($event)">
           </app-dialog-button>
         </mat-list-item>
       </mat-list>
+
+      <button mat-raised-button color="accent" (click)="commitPopulationData()">
+        Commit Changes
+      </button>
     </mat-expansion-panel>
   </mat-accordion>
 </mat-sidenav>

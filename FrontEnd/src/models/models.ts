@@ -11,8 +11,8 @@ export interface Error {
 }
 
 export interface NeighborData {
-  precinct1: string;
-  precinct2: string;
+  id: number;
+  neighborID: string;
 }
 
 export interface ElectionData {
@@ -47,7 +47,6 @@ export interface Precinct {
   populationData: PopulationData;
   precinctGeoJSON;
   layer;
-  highlighted;
 }
 
 export interface CongressionalDistrict {

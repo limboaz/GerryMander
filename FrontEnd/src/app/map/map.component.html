@@ -33,22 +33,39 @@
     <div class="map-edit-buttons">
       <button mat-icon-button aria-label="Combine precincts"
               matTooltipPosition="before" matTooltip="Select and Merge two Precincts"
-              (click)="combiningPrecincts = true;">
+              (click)="changeState(EditState.MERGING_PRECINCTS, 'Please select a precinct to merge into this one')"
+              *ngIf="selectedPrecinct">
         <mat-icon>call_merge</mat-icon>
-      </button>
-      <button mat-icon-button
-              matTooltipPosition="before" matTooltip="Cancel combining precincts" *ngIf="combiningPrecincts"
-              (click)="cancelCombine()">
-        <mat-icon>clear</mat-icon>
       </button>
       <button mat-icon-button aria-label="Add new neighbor"
               matTooltipPosition="before" matTooltip="Add Neighbor to Selected Precinct"
-              (click)="addingNeighbor = true;" *ngIf="selectedPrecinct">
+              (click)="changeState(EditState.ADDING_NEIGHBOR, 'Please select a precinct to add as a neighbor');"
+              *ngIf="selectedPrecinct">
         <mat-icon>add_circle</mat-icon>
       </button>
+      <button mat-icon-button aria-label="Add new neighbor"
+              matTooltipPosition="before" matTooltip="Remove a Neighbor from Selected Precinct"
+              (click)="changeState(EditState.REMOVING_NEIGHBOR, 'Please select a neighbor to remove');"
+              *ngIf="selectedPrecinct">
+        <mat-icon>remove_circle</mat-icon>
+      </button>
+      <button mat-icon-button aria-label="Add new neighbor"
+              matTooltipPosition="before" matTooltip="Change the boundary of the selected precinct"
+              (click)="changeState(EditState.EDIT_BOUNDARY, 'Change the boundary of the selected precinct');"
+              *ngIf="selectedPrecinct">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button mat-icon-button aria-label="Add new neighbor"
+              matTooltipPosition="before" matTooltip="Create a new boundary for the selected precinct"
+              (click)="changeState(EditState.CREATE_BOUNDARY, 'Create a new boundary for the selected precinct');"
+              *ngIf="selectedPrecinct">
+        <mat-icon>fiber_new</mat-icon>
+      </button>
       <button mat-icon-button
-              matTooltipPosition="before" matTooltip="Currently Adding Neighbor (Click here to cancel)"
-              *ngIf="addingNeighbor" (click)="cancelAdd()">
+              matTooltipPosition="before" matTooltip="(Click here to cancel)"
+              id="cancelNeighbors"
+              *ngIf="modifyingPrecinct"
+              (click)="cancelState()">
         <mat-icon>clear</mat-icon>
       </button>
     </div>

@@ -1,5 +1,12 @@
 import {Component, OnInit} from '@angular/core';
 
+const themeStyles = {
+  'indigo-pink.css': '',
+  'deeppurple-amber.css': '',
+  'pink-bluegrey.css': 'a {color: #dabb13;}',
+  'purple-green.css': 'a {color: #dabb13;}'
+};
+
 @Component({
   selector: 'app-attribute-menu',
   templateUrl: './attribute-menu.component.html',
@@ -10,5 +17,13 @@ export class AttributeMenuComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  changeTheme(themeName) {
+    // @ts-ignore
+    document.getElementById('themeAsset').href = `assets/${themeName}`;
+    const themeStyle = document.getElementById('themeStyle');
+    themeStyle.innerHTML = '';
+    themeStyle.appendChild(document.createTextNode(themeStyles[themeName]));
   }
 }

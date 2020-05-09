@@ -1,4 +1,4 @@
-<mat-accordion>
+<mat-accordion multi="true">
   <mat-expansion-panel>
     <mat-expansion-panel-header>
       <mat-panel-title>
@@ -14,28 +14,28 @@
       </mat-expansion-panel-header>
       <mat-list>
         <mat-list-item>Ohio</mat-list-item>
-        <mat-list-item><a href="https://www.sos.state.oh.us/globalassets/elections/2016/gen/precinct.xlsx">
+        <mat-list-item><a target="_blank" href="https://www.sos.state.oh.us/globalassets/elections/2016/gen/precinct.xlsx">
           <button mat-button>Congressional/Presidential election 2016</button>
         </a></mat-list-item>
-        <mat-list-item><a
+        <mat-list-item><a target="_blank"
           href="https://www.sos.state.oh.us/globalassets/elections/2018/gen/2018-11-06_statewideprecinct_miami.xlsx">
           <button mat-button>Congressional election 2018</button>
         </a></mat-list-item>
         <mat-list-item>Arizona</mat-list-item>
-        <mat-list-item><a href="https://apps.azsos.gov/results/2016/General/">
+        <mat-list-item><a target="_blank" href="https://apps.azsos.gov/results/2016/General/">
           <button mat-button>Congressional/Presidential election 2016</button>
         </a></mat-list-item>
-        <mat-list-item><a href="https://azsos.gov/precinct-level-results-county-2018-general-election">
+        <mat-list-item><a target="_blank" href="https://azsos.gov/precinct-level-results-county-2018-general-election">
           <button mat-button>Congressional Election 2018</button>
         </a></mat-list-item>
         <mat-list-item>Wisconsin</mat-list-item>
-        <mat-list-item><a href="https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/PSKDUJ">
+        <mat-list-item><a target="_blank" href="https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/PSKDUJ">
           <button mat-button>Congressional 2016</button>
         </a></mat-list-item>
-        <mat-list-item><a href="https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/LYWX3D">
+        <mat-list-item><a target="_blank" href="https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/LYWX3D">
           <button mat-button>Presidential 2016</button>
         </a></mat-list-item>
-        <mat-list-item><a href="https://github.com/MEDSL/2018-elections-official/blob/master/precinct_2018.zip">
+        <mat-list-item><a target="_blank" href="https://github.com/MEDSL/2018-elections-official/blob/master/precinct_2018.zip">
           <button mat-button>Congressional 2018</button>
         </a></mat-list-item>
       </mat-list>
@@ -45,18 +45,72 @@
         Census Data
       </mat-expansion-panel-header>
       <mat-list>
-        <mat-list-item><a href="https://www2.census.gov/geo/tiger/TIGER2010BLKPOPHU/">
+        <mat-list-item><a target="_blank" href="https://www2.census.gov/geo/tiger/TIGER2010BLKPOPHU/">
           <button mat-button>Census Block Geography</button>
         </a></mat-list-item>
-        <mat-list-item><a
+        <mat-list-item><a target="_blank"
           href="https://factfinder.census.gov/faces/affhelp/jsf/pages/metadata.xhtml?lang=en&type=table&id=table.en.DEC_10_DP_DPDP1#main_content">
           <button mat-button>Demographic Data</button>
         </a></mat-list-item>
-        <!--        <mat-list-item><a><button mat-button></button></a></mat-list-item>-->
-        <!--        <mat-list-item><a><button mat-button></button></a></mat-list-item>-->
-        <!--        <mat-list-item><a><button mat-button></button></a></mat-list-item>-->
-        <!--        <mat-list-item><a><button mat-button></button></a></mat-list-item>-->
+        <!--        <mat-list-item><a target="_blank"><button mat-button></button></a></mat-list-item>-->
+        <!--        <mat-list-item><a target="_blank"><button mat-button></button></a></mat-list-item>-->
+        <!--        <mat-list-item><a target="_blank"><button mat-button></button></a></mat-list-item>-->
+        <!--        <mat-list-item><a target="_blank"><button mat-button></button></a></mat-list-item>-->
       </mat-list>
     </mat-expansion-panel>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        Boundary Data
+      </mat-expansion-panel-header>
+      <mat-list>
+        <mat-list-item><a target="_blank"
+          href="https://catalog.data.gov/dataset/tiger-line-shapefile-2012-2010-state-arizona-2010-census-voting-district-state-based-vtd">
+          <button mat-button> Arizona Precincts </button>
+        </a></mat-list-item>
+        <mat-list-item><a target="_blank"
+          href="https://catalog.data.gov/dataset/tiger-line-shapefile-2012-2010-state-ohio-2010-census-voting-district-state-based-vtd/resource/751e4a66-a9c1-4171-965f-7d310dc6315b">
+          <button mat-button>Ohio Precincts</button>
+        </a></mat-list-item>
+        <mat-list-item><a target="_blank"
+          href="https://data-ltsb.opendata.arcgis.com/datasets/2012-2020-election-data-with-2018-wards?geometry=-92.599%2C44.480%2C-87.373%2C45.162">
+          <button mat-button>Wisconsin Precincts</button>
+        </a></mat-list-item>
+        <mat-list-item><a target="_blank"
+          href="https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_us_state_5m.zip">
+          <button mat-button>State Boundaries</button>
+        </a></mat-list-item>
+        <mat-list-item><a target="_blank"
+          href="https://catalog.data.gov/dataset/tiger-line-shapefile-2018-nation-u-s-116th-congressional-district-national">
+          <button mat-button>Congressional District Boundaries</button>
+        </a></mat-list-item>
+        <mat-list-item><a target="_blank"
+          href="https://irma.nps.gov/Datastore/Reference/Profile/2224545?lnv=True">
+          <button mat-button>National Parks Boundaries</button>
+        </a></mat-list-item>
+      </mat-list>
+    </mat-expansion-panel>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>Change the current theme</mat-panel-title>
+      <mat-panel-description><mat-icon>palette</mat-icon></mat-panel-description>
+    </mat-expansion-panel-header>
+    <mat-radio-group style="display: flex; flex-direction: column;">
+      <mat-list>
+        <mat-list-item>
+          <mat-radio-button checked value="1" (click)="changeTheme('deeppurple-amber.css')">Deep Purple and Amber</mat-radio-button>
+        </mat-list-item>
+        <mat-list-item>
+          <mat-radio-button value="2" (click)="changeTheme('indigo-pink.css')">Indigo and Pink</mat-radio-button>
+        </mat-list-item>
+        <mat-list-item>
+          <mat-radio-button value="3" (click)="changeTheme('pink-bluegrey.css')">Pink and Blue-Grey</mat-radio-button>
+        </mat-list-item>
+        <mat-list-item>
+          <mat-radio-button value="4" (click)="changeTheme('purple-green.css')">Purple and Green</mat-radio-button>
+        </mat-list-item>
+      </mat-list>
+    </mat-radio-group>
   </mat-expansion-panel>
 </mat-accordion>

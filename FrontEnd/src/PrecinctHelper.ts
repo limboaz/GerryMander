@@ -5,16 +5,12 @@ function getNeighbors(precinct: Precinct, currentPrecincts): Precinct[] {
   if (!precinct.neighbors) {
     return [];
   }
-  return precinct.neighbors.map(p =>
-    p.precinct1 === precinct.uid ? currentPrecincts[p.precinct2] : currentPrecincts[p.precinct1]);
+  return precinct.neighbors.map(p => currentPrecincts[p.neighborID]);
 }
 
 export function highlightNeighbors(precinct: Precinct, currentPrecincts) {
-  if (!precinct.highlighted) {
-    for (const n of getNeighbors(precinct, currentPrecincts)) {
-      n.layer.setStyle(highlightStyle);
-    }
-    precinct.highlighted = true;
+  for (const n of getNeighbors(precinct, currentPrecincts)) {
+    n.layer.setStyle(highlightStyle);
   }
 }
 
@@ -22,11 +18,15 @@ export function resetNeighbors(precinct: Precinct, currentPrecincts) {
   for (const n of getNeighbors(precinct, currentPrecincts)) {
     n.layer.resetStyle();
   }
-  precinct.highlighted = false;
 }
 
-export function addNeighbor(precinct: Precinct, newNeighbor: Precinct) {
+export function addNeighbor(precinct: Precinct, newNeighbor: Precinct, currentPrecincts) {
   // Add newNeighbor as neighbor to Precinct and vice versa
+  highlightNeighbors(precinct, currentPrecincts);
+}
+
+export function removeNeighbor(precinct: Precinct, oldNeighbor: Precinct, currentPrecincts) {
+  // remove neighbor
 }
 
 export function mergePrecincts(precinctA: Precinct, precinctB: Precinct): Precinct {

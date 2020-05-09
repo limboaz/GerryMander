@@ -1,6 +1,6 @@
 import {Component, OnInit, Output, EventEmitter} from '@angular/core';
 import {Error} from '../../models/models';
-import * as l from 'leaflet';
+import * as L from 'leaflet';
 import {errorStyle, selectedStyle} from '../styles';
 import {ErrorType} from '../../models/enums';
 
@@ -12,7 +12,7 @@ import {ErrorType} from '../../models/enums';
 export class ErrorListComponent implements OnInit {
   public currentErrors = {};
   public errorKeys = Object.keys(ErrorType).filter(e => !isNaN(Number(ErrorType[e])));
-  public errorsLayer = l.layerGroup();
+  public errorsLayer = L.layerGroup();
   public map;
   @Output() notify = new EventEmitter();
   constructor() {}
@@ -38,7 +38,7 @@ export class ErrorListComponent implements OnInit {
     for (const error of errors) {
       if (error.errorBoundaryGeoJSON) {
         error.errorBoundaryGeoJSON = JSON.parse(error.errorBoundaryGeoJSON);
-        error.layer = l.geoJSON(error.errorBoundaryGeoJSON, {style: errorStyle});
+        error.layer = L.geoJSON(error.errorBoundaryGeoJSON, {style: errorStyle});
         this.errorsLayer.addLayer(error.layer);
       }
       if (this.currentErrors[error.type]) {

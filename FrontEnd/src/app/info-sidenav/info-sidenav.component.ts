@@ -1,7 +1,8 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
 import {PopulationData, ElectionData} from '../../models/models';
-import {CandidateParty, ElectionType} from '../../models/enums';
+import {ElectionType} from '../../models/enums';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 
 @Component({
   selector: 'app-info-sidenav',
@@ -11,11 +12,12 @@ import {CandidateParty, ElectionType} from '../../models/enums';
 export class InfoSidenavComponent implements OnInit {
   @ViewChild(MatSidenav)
   public sidenav: MatSidenav;
-
-  CandidateParty = CandidateParty;
   populationData: PopulationData;
   presidentialData: ElectionData[];
-  congressionalData;
+  electionData: ElectionData[];
+  precinctID: string;
+  congressionalData: {};
+  Number = Number;
 
   populationLabels = {
     total: 'Total',
@@ -25,11 +27,12 @@ export class InfoSidenavComponent implements OnInit {
     pacificIslander: 'Native Hawaiian and Other Pacific Islander',
     hispanic: 'Hispanic',
     nativeAmerican: 'Native American',
-    others: 'Others'
+    other: 'Others'
   };
   populationKeys = Object.keys(this.populationLabels);
 
-  constructor() {}
+  constructor(private http: HttpClient) {
+  }
 
   ngOnInit(): void {
   }
@@ -37,8 +40,10 @@ export class InfoSidenavComponent implements OnInit {
   addElectionData(electionData: ElectionData[]) {
     const congressionalData = electionData.filter(e => e.type.toString() === ElectionType[ElectionType.CONGRESSIONAL]);
     const congressionalDataDictionary = {};
+    this.electionData = [];
 
     for (const candidate of congressionalData) {
+      this.electionData.push(candidate);
       if (congressionalDataDictionary[candidate.year]) {
         congressionalDataDictionary[candidate.year].push(candidate);
       } else {
@@ -48,6 +53,25 @@ export class InfoSidenavComponent implements OnInit {
 
     this.congressionalData = congressionalDataDictionary;
     this.presidentialData = electionData.filter(e => e.type.toString() === ElectionType[ElectionType.PRESIDENTIAL]);
+    this.electionData = this.electionData.concat(this.presidentialData);
     this.sidenav.open();
+  }
+
+  // add error id?
+  commitElectionData() {
+    console.log(this.electionData);
+    this.http.post(`/datacorrection/editelectiondata?uid=${this.precinctID}&errID=0`,
+      JSON.stringify(this.electionData),
+      {headers: new HttpHeaders({'Content-Type': 'application/json'})})
+      .subscribe();
+  }
+
+  // add error id?
+  commitPopulationData() {
+    console.log(this.populationData);
+    this.http.post(`/datacorrection/editpopulationdata?uid=${this.precinctID}&errID=0`,
+      JSON.stringify(this.populationData),
+      {headers: new HttpHeaders({'Content-Type': 'application/json'})})
+      .subscribe();
   }
 }

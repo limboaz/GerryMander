@@ -1,4 +1,4 @@
-<mat-accordion>
+<mat-accordion multi="true">
   <mat-expansion-panel *ngFor="let errorType of errorKeys" class="expansion-panel">
     <mat-expansion-panel-header>
       <mat-panel-title>
@@ -15,7 +15,10 @@
             ID: {{error.id}}
           </mat-panel-title>
         </mat-expansion-panel-header>
-        Data Source: <a href="https://{{error.dataSource}}" target="_blank">{{error.dataSource}}</a>
+        Data Source:
+        <a href="https://{{error.dataSource}}" target="_blank">
+          <button mat-button>{{error.dataSource}}</button>
+        </a>
       </mat-expansion-panel>
     </div>
   </mat-expansion-panel>
