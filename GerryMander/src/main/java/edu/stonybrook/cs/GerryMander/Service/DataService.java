@@ -89,4 +89,9 @@ public class DataService {
         logger.info("getPrecinctData: uid = " + uid);
         return em.find(Precinct.class, uid).getElectionData();
     }
+
+    public List<NeighborData> getPrecinctNeighbors(String uid) {
+        logger.info("getPrecinctNeighbors: uid = " + uid);
+        return em.find(Precinct.class, uid).getNeighbors();
+    }
 }

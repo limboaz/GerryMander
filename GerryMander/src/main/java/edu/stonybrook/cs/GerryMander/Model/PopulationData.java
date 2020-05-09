@@ -1,10 +1,12 @@
 package edu.stonybrook.cs.GerryMander.Model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 
 @Entity
+@JsonIgnoreProperties("precinct")
 public class PopulationData {
     private long id;
     private int total;

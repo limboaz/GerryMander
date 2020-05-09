@@ -105,7 +105,6 @@ public class Precinct {
     }
 
     @OneToOne(mappedBy = "precinct", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JsonManagedReference
     public PopulationData getPopulationData() {
         return populationData;
     }

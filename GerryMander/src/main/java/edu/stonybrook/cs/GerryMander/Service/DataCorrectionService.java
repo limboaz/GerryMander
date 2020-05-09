@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 @Service
 public class DataCorrectionService {
@@ -20,7 +22,7 @@ public class DataCorrectionService {
      * different exceptions.
      */
 
-    public void editElectionData(Long errID, String uid, ElectionData electionData){
+    public void editElectionData(Long errID, String uid, List<ElectionData> electionData){
         logger.info("editElectionData: errorID = " + errID + ", uid = " + uid);
     }
 

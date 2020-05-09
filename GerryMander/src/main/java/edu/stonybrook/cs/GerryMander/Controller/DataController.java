@@ -107,6 +107,13 @@ public class DataController {
         return new ResponseEntity<>(result, status);
     }
 
+    @GetMapping("/getprecinctneighbors")
+    public ResponseEntity<List<NeighborData>> getPrecinctNeighbors(@RequestParam String uid){
+        HttpStatus status = HttpStatus.OK;
+        List<NeighborData> result = dataService.getPrecinctNeighbors(uid);
+        return new ResponseEntity<>(result, status);
+    }
+
     @GetMapping(value = "/getnationalparksdata", produces = "application/zip")
     public byte[] getNationalParksData() {
         return DataService.nationalParksData;

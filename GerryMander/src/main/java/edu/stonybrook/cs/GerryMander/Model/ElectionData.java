@@ -1,12 +1,14 @@
 package edu.stonybrook.cs.GerryMander.Model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import edu.stonybrook.cs.GerryMander.Model.Enum.CandidateParty;
 import edu.stonybrook.cs.GerryMander.Model.Enum.ElectionType;
 
 import javax.persistence.*;
 
 @Entity
+@JsonIgnoreProperties("precinct")
 public class ElectionData {
     private long id;
     private int year;

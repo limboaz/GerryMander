@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 
@@ -24,9 +26,10 @@ public class DataCorrectionController {
     private DataCorrectionService dataCorrectionService;
 
     @PostMapping("/editelectiondata")
-    public ResponseEntity<Object> editElectionData(@RequestBody ElectionData electionData, @RequestParam Map<String, String> req){
+    public ResponseEntity<Object> editElectionData(@RequestBody List<ElectionData> electionData, @RequestParam Map<String, String> req){
         HttpStatus status = HttpStatus.OK;
 
+        System.out.println(Arrays.toString(electionData.toArray()));
         Long errID = Long.valueOf(req.get("errID"));
         String uid = req.get("uid");
 
