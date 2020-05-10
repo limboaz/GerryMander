@@ -2,9 +2,20 @@ package edu.stonybrook.cs.GerryMander.Service;
 
 import edu.stonybrook.cs.GerryMander.Model.Correction;
 import edu.stonybrook.cs.GerryMander.Model.Precinct;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryCollection;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.geojson.GeoJsonReader;
+import org.locationtech.jts.io.geojson.GeoJsonWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import java.util.List;
 
 
 
@@ -13,10 +24,34 @@ public class BoundaryCorrectionService {
 
     private static final Logger logger = LoggerFactory.getLogger(BoundaryCorrectionService.class);
 
-    public String mergePrecincts(Long errID, String precinctA, String precinctB){
+    @PersistenceContext
+    private EntityManager em;
+
+    public Precinct mergePrecincts(Long errID, String precinctA, String precinctB){
         logger.info("mergePrecincts: errID = " + errID + ", precinctA = " + precinctA + ", precinctB = " + precinctB);
 
-        return "mergePrecincts is called.";
+        Query query = em.createQuery("select P from Precinct as P where P.uid in (:ids)");
+        query.setParameter("ids", List.of(precinctA, precinctB));
+        List<Precinct> precincts = query.getResultList();
+
+        if (query.getResultList().size() > 0) {
+            GeoJsonReader reader = new GeoJsonReader();
+            GeoJsonWriter writer = new GeoJsonWriter();
+            try {
+                Geometry aGeoJSON = reader.read(precincts.get(0).getPrecinctGeoJSON());
+                Geometry bGeoJSON = reader.read(precincts.get(1).getPrecinctGeoJSON());
+                GeometryCollection geometryCollection = new GeometryCollection(new Geometry[]{aGeoJSON, bGeoJSON}, new GeometryFactory());
+                String mergedBoundary = writer.write(geometryCollection.union());
+
+                Precinct mergedPrecinct = new Precinct();
+
+                mergedPrecinct.setPrecinctGeoJSON(mergedBoundary);
+                return mergedPrecinct;
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
     public void updatePrecinctBoundary(Long errID, String uid, String newBoundary){

@@ -18,6 +18,8 @@ dependencies {
 	implementation 'com.fasterxml.jackson.core:jackson-core:2.9.8'
 	implementation 'com.fasterxml.jackson.core:jackson-annotations:2.9.8'
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
+	implementation 'org.locationtech.jts:jts-core:1.16.1'
+	implementation 'org.locationtech.jts.io:jts-io-common:1.16.1'
 	runtimeOnly 'mysql:mysql-connector-java'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'

@@ -1,5 +1,6 @@
 package edu.stonybrook.cs.GerryMander.Controller;
 
+import edu.stonybrook.cs.GerryMander.Model.Precinct;
 import edu.stonybrook.cs.GerryMander.Service.BoundaryCorrectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,14 +22,10 @@ public class BoundaryCorrectionController {
     private BoundaryCorrectionService boundaryCorrectionService;
 
     @PostMapping("/mergeprecincts")
-    public ResponseEntity<String> mergePrecincts(@RequestBody Map<String, String> req){
+    public ResponseEntity<Precinct> mergePrecincts(@RequestParam String precinctA, @RequestParam String precinctB, @RequestParam Long errID){
         HttpStatus status = HttpStatus.OK;
 
-        Long errID = Long.valueOf(req.get("errID"));
-        String precinctA = req.get("precinctA");
-        String precinctB = req.get("precinctB");
-
-        String result = boundaryCorrectionService.mergePrecincts(errID, precinctA, precinctB);
+        Precinct result = boundaryCorrectionService.mergePrecincts(errID, precinctA, precinctB);
         if(result == null){
             status = HttpStatus.INTERNAL_SERVER_ERROR;
             logger.error("mergePrecincts: return value is null. ");
