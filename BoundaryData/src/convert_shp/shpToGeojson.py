@@ -4,7 +4,7 @@ from pprint import pprint
 
 features = []
 crs = None
-with fiona.collection("tl_2012_04_vtd10/tl_2012_04_vtd10.shp", "r") as source:
+with fiona.collection("tl_2012_39_vtd10/tl_2012_39_vtd10.shp", "r") as source:
     for feat in source:
         pprint(feat['properties']["NAME10"])
         county = feat['properties']["COUNTYFP10"]
