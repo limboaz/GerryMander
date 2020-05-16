@@ -1,9 +1,19 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[1]:
+
+
 import json, os
 import pandas as pd
 
+
+# In[2]:
+
+
 # delete census blocks that have zero population
 # load block data from csv
-file_path = "../raw_data/Arizona/census_blocks"
+file_path = "C:/Users/mlo10/IdeaProjects/GerryMander/CensusData/raw_data/Ohio/census_blocks"
 demo_files = list(os.listdir(file_path))
 df_demos = pd.DataFrame()
 rows_to_rm = []
@@ -30,6 +40,11 @@ df_demos = df_demos.rename(columns={
              "Population of one race: - American Indian and Alaska Native alone" : "NativeAmerican",
              "Population of one race: - Native Hawaiian and Other Pacific Islander alone" : "PacificIslander"
             })
+
+
+# In[3]:
+
+
 # keep only the fields we care about in census data
 # initialize new col for misc demographic cols
 df_demos["Other"] = 0
@@ -44,10 +59,32 @@ for block in df_demos.index:
 # delete other cols that are now aggregated into other
 df_demos = df_demos.drop(columns = other_cols)
 
-#load census block geojson
+
+# In[4]:
+
+
+print(df_demos)
+
+
+# In[5]:
+
+
+csv_file = 'C:/Users/mlo10/IdeaProjects/GerryMander/CensusData/WI_pop_blocks.csv'
+df_demos.to_csv(path_or_buf=csv_file, index=False)
+
+
+# In[6]:
+
+
 blocks_gj = ""
-with open("../raw_data/Geography/GeoJSON/censusblock_az.json") as f:
+#load census block geojson
+with open("C:/Users/mlo10/IdeaProjects/GerryMander/CensusData/raw_data/Geography/GeoJSON/censusblock_oh.json") as f:
     blocks_gj = json.load(f)["features"]
+print(blocks_gj[0])
+
+
+# In[7]:
+
 
 # save block bdy data in csv
 df_b = pd.DataFrame()
@@ -57,15 +94,53 @@ for censusblock in blocks_gj:
     del censusblock["properties"]
     blocks.append({
         "Id": block_id,
-        "BDY": str(censusblock).replace("\'", "\"")
+        "BDY": json.dumps(censusblock["geometry"])
     })
 df_b = df_b.append(blocks, ignore_index =True)
+
+
+# In[8]:
+
+
+print(rows_to_rm)
+
+
+# In[9]:
+
+
 # remove blocks from block bdy dataframe
+print(df_b)
 df_b = df_b[~df_b["Id"].isin(rows_to_rm)]
+print("REMOVED ZERO ROWS")
+print(len(df_b))
+print(len(df_demos))
+
+
+# In[10]:
+
+
+csv_file = 'C:/Users/mlo10/IdeaProjects/GerryMander/CensusData/OH_blocks.csv'
+df_b.to_csv(path_or_buf=csv_file, index=False)
+
+
+# In[11]:
+
 
 # join pop and bdy data
 df_combined = pd.merge(df_b, df_demos, left_on='Id', right_on='Id2')
 df_combined = df_combined.drop(columns="Id2")
+print(df_combined)
 
-csv_file = '../CensusData/AZ_blocks.csv'
+
+# In[12]:
+
+
+csv_file = 'C:/Users/mlo10/IdeaProjects/GerryMander/CensusData/OH_blocks.csv'
 df_combined.to_csv(path_or_buf=csv_file, index=False)
+
+
+# In[ ]:
+
+
+
+
