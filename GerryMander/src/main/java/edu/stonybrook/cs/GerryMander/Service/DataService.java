@@ -82,7 +82,7 @@ public class DataService {
 
     public List<Correction> getCorrectionLog() {
         logger.info("getCorrectionLog: called. ");
-        return new ArrayList<Correction>();
+        return new ArrayList<Correction>(em.createQuery("select e from Correction e").getResultList());
     }
 
     public List<ElectionData> getElectionData(String uid) {

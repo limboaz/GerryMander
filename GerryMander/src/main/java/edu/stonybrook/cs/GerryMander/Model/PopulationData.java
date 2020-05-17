@@ -19,6 +19,29 @@ public class PopulationData {
     private int other;
     private Precinct precinct;
 
+    public PopulationData(){}
+
+    public PopulationData(int total, int white, int black, int asian, int hispanic, int nativeAmerican,
+                          int pacificIslander, int other, Precinct precinct){
+        this.total = total;
+        this.white = white;
+        this.black = black;
+        this.asian = asian;
+        this.hispanic = hispanic;
+        this.nativeAmerican = nativeAmerican;
+        this.pacificIslander = pacificIslander;
+        this.other = other;
+        this.precinct = precinct;
+    }
+
+    static public PopulationData mergePop(Precinct precinctA, Precinct precinctB, Precinct mergedPrecinct){
+        PopulationData popA = precinctA.getPopulationData();
+        PopulationData popB = precinctB.getPopulationData();
+        return new PopulationData(popA.getTotal() + popB.getTotal(), popA.getWhite() + popB.getWhite(), popA.getBlack() + popB.getBlack(),
+                popA.getAsian() + popB.getAsian(), + popA.getHispanic() + popB.getHispanic(), + popA.getNativeAmerican() + popB.getNativeAmerican(),
+                popA.getPacificIslander() + popB.getPacificIslander(), popA.getOther() + popB.getOther(), mergedPrecinct);
+    }
+
     @Id
     @GeneratedValue
     public long getId() {

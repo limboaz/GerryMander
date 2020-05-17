@@ -29,7 +29,6 @@ public class DataCorrectionController {
     public ResponseEntity<Object> editElectionData(@RequestBody List<ElectionData> electionData, @RequestParam Map<String, String> req){
         HttpStatus status = HttpStatus.OK;
 
-        System.out.println(Arrays.toString(electionData.toArray()));
         Long errID = Long.valueOf(req.get("errID"));
         String uid = req.get("uid");
 

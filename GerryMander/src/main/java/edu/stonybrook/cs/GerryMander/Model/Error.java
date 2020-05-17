@@ -16,7 +16,9 @@ public abstract class  Error {
     protected String dataSource;
     protected Precinct precinct;
     protected State state;
+    protected String congID;
     protected List<Correction> corrections;
+    private boolean isResolved = false;
 
     @Id
     @GeneratedValue
@@ -76,4 +78,12 @@ public abstract class  Error {
     public void setState(State state) {
         this.state = state;
     }
+
+    public String getCong(){ return this.congID; }
+
+    public void setCong(String congID){ this.congID = congID; }
+
+    public boolean ifResolved(){ return this.isResolved; }
+
+    public void setResolved(boolean status){ this.isResolved = status; }
 }

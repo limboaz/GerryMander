@@ -6,6 +6,7 @@ import edu.stonybrook.cs.GerryMander.Model.Enum.CandidateParty;
 import edu.stonybrook.cs.GerryMander.Model.Enum.ElectionType;
 
 import javax.persistence.*;
+import java.util.*;
 
 @Entity
 @JsonIgnoreProperties("precinct")
@@ -17,6 +18,32 @@ public class ElectionData {
     private CandidateParty party;
     private int voteTotal;
     private Precinct precinct;
+
+    public ElectionData(){}
+
+    public ElectionData(int year, ElectionType type, String candidate, CandidateParty party, int voteTotal, Precinct precinct){
+        this.year = year;
+        this.type = type;
+        this.candidate = candidate;
+        this.party = party;
+        this.voteTotal = voteTotal;
+        this.precinct = precinct;
+    }
+
+    public static List<ElectionData> mergeElection(List<ElectionData> electA, List<ElectionData> electB){
+        Map<String, ElectionData> mergedElection = new HashMap<>();
+        for(ElectionData item: electA)
+            mergedElection.put(item.getYear() + item.getCandidate(), item);
+        for(ElectionData item: electB){
+            if(mergedElection.containsKey(item.getYear() + item.getCandidate())){
+                ElectionData prev = mergedElection.get(item.getYear() + item.getCandidate());
+                mergedElection.put(item.getYear() + item.getCandidate(), new ElectionData(item.getYear(), item.getType(), item.getCandidate(), item.getParty(), item.getVoteTotal() + prev.getVoteTotal(), item.getPrecinct()));
+            }else{
+                mergedElection.put(item.getYear() + item.getCandidate(), item);
+            }
+        }
+        return new ArrayList<>(mergedElection.values());
+    }
 
     @Id
     @GeneratedValue

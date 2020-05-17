@@ -3,12 +3,30 @@ package edu.stonybrook.cs.GerryMander.Model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 
 @Entity
 public class NeighborData {
     private long id;
     private Precinct precinct;
     private String neighborID;
+
+    public NeighborData(){}
+
+    public NeighborData(Precinct precinct, String neighborID){
+        this.precinct = precinct;
+        this.neighborID = neighborID;
+    }
+
+    public static List<NeighborData> mergeNeighbors(List<NeighborData> neighborA, List<NeighborData> neighborB){
+        Set<NeighborData> mergedNeighbors = new HashSet<>(neighborA);
+        mergedNeighbors.addAll(neighborB);
+        return new ArrayList<>(mergedNeighbors);
+    }
 
     @Id
     @GeneratedValue

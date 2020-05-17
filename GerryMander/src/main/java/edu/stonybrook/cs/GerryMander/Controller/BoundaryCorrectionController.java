@@ -51,10 +51,8 @@ public class BoundaryCorrectionController {
         HttpStatus status = HttpStatus.OK;
 
         Long errID = Long.valueOf(req.get("errID"));
-        String boundary = req.get("boundary");
-        String precinctID = req.get("uid");
 
-        String result = boundaryCorrectionService.defineGhostPrecinct(errID, boundary, precinctID);
+        String result = boundaryCorrectionService.defineGhostPrecinct(errID);
         if(result == null){
             status = HttpStatus.INTERNAL_SERVER_ERROR;
             logger.error("defineGhostPrecinct: return value is null. ");
