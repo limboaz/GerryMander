@@ -84,7 +84,7 @@ public class Precinct {
         this.name = name;
     }
 
-    @OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonManagedReference
     public List<Error> getErrors() {
         return errors;
@@ -94,7 +94,7 @@ public class Precinct {
         this.errors = errors;
     }
 
-    @OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonManagedReference
     public List<ElectionData> getElectionData() {
         return electionData;
@@ -104,7 +104,7 @@ public class Precinct {
         this.electionData = electionData;
     }
 
-    @OneToOne(mappedBy = "precinct", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "precinct", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     public PopulationData getPopulationData() {
         return populationData;
     }
@@ -122,7 +122,7 @@ public class Precinct {
         this.precinctGeoJSON = precinctGeoJSON;
     }
 
-    @OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonManagedReference
     public List<NeighborData> getNeighbors() {
         return neighbors;

@@ -71,8 +71,8 @@ public class BoundaryCorrectionService {
 
                 List<NeighborData> mergedNeighbor = NeighborData.mergeNeighbors(preA.getNeighbors(), preB.getNeighbors());
                 mergedPrecinct.setNeighbors(mergedNeighbor);
-
-                em.persist(mergedPrecinct);
+                em.remove(preA);
+                em.remove(preB);
 
                 BoundaryError err = em.find(BoundaryError.class, errID);
                 err.setResolved(true);
@@ -86,6 +86,7 @@ public class BoundaryCorrectionService {
                 correction.setAssociatedError(err);
                 correction.setType(CorrectionType.MERGE_PRECINCT);
                 em.persist(correction);
+                em.merge(mergedPrecinct);
 
                 return mergedPrecinct;
             } catch (ParseException e) {
