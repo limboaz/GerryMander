@@ -6,7 +6,6 @@ import edu.stonybrook.cs.GerryMander.Model.Enum.ErrorType;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
@@ -16,7 +15,7 @@ public abstract class  Error {
     protected String dataSource;
     protected Precinct precinct;
     protected State state;
-    protected String congID;
+    protected String congId;
     protected List<Correction> corrections;
     private boolean isResolved = false;
 
@@ -79,9 +78,9 @@ public abstract class  Error {
         this.state = state;
     }
 
-    public String getCong(){ return this.congID; }
+    public String getCongId(){ return this.congId; }
 
-    public void setCong(String congID){ this.congID = congID; }
+    public void setCongId(String congID){ this.congId = congID; }
 
     public boolean ifResolved(){ return this.isResolved; }
 

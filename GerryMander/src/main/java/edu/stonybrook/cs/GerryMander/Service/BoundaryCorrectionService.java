@@ -125,7 +125,7 @@ public class BoundaryCorrectionService {
         BoundaryError err = em.find(BoundaryError.class, errID);
         if(err != null){
             try {
-                String uid = err.getState().getName() + "_" + err.getCong() + "_" + errID;
+                String uid = err.getState().getName() + "_" + err.getCongId() + "_" + errID;
                 Precinct precinct = new Precinct(uid);
                 precinct.setPrecinctGeoJSON(err.getErrorBoundaryGeoJSON());
                 em.persist(precinct);
