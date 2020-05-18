@@ -3,6 +3,9 @@ import {MatSidenav} from '@angular/material/sidenav';
 import {PopulationData, ElectionData} from '../../models/models';
 import {ElectionType} from '../../models/enums';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {ErrorListComponent} from '../error-list/error-list.component';
+import {NotifierService} from 'angular-notifier';
+import {notificationType, warningMessage} from '../../PrecinctHelper';
 
 @Component({
   selector: 'app-info-sidenav',
@@ -16,6 +19,7 @@ export class InfoSidenavComponent implements OnInit {
   presidentialData: ElectionData[];
   electionData: ElectionData[];
   precinctID: string;
+  errorList: ErrorListComponent;
   congressionalData: {};
   Number = Number;
 
@@ -31,7 +35,7 @@ export class InfoSidenavComponent implements OnInit {
   };
   populationKeys = Object.keys(this.populationLabels);
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private notifier: NotifierService) {
   }
 
   ngOnInit(): void {
@@ -57,21 +61,25 @@ export class InfoSidenavComponent implements OnInit {
     this.sidenav.open();
   }
 
-  // add error id?
   commitElectionData() {
-    console.log(this.electionData);
-    this.http.post(`/datacorrection/editelectiondata?uid=${this.precinctID}&errID=0`,
+    if (!this.errorList.selectedError) {
+      this.notifier.notify(notificationType, warningMessage);
+      return;
+    }
+    this.http.post(`/datacorrection/editelectiondata?uid=${this.precinctID}&errID=${this.errorList.selectedError.id}`,
       JSON.stringify(this.electionData),
       {headers: new HttpHeaders({'Content-Type': 'application/json'})})
-      .subscribe();
+      .subscribe(() => this.errorList.selectedError.isResolved = true);
   }
 
-  // add error id?
   commitPopulationData() {
-    console.log(this.populationData);
-    this.http.post(`/datacorrection/editpopulationdata?uid=${this.precinctID}&errID=0`,
+    if (!this.errorList.selectedError) {
+      this.notifier.notify(notificationType, warningMessage);
+      return;
+    }
+    this.http.post(`/datacorrection/editpopulationdata?uid=${this.precinctID}&errID=${this.errorList.selectedError.id}`,
       JSON.stringify(this.populationData),
       {headers: new HttpHeaders({'Content-Type': 'application/json'})})
-      .subscribe();
+      .subscribe(() => this.errorList.selectedError.isResolved = true);
   }
 }

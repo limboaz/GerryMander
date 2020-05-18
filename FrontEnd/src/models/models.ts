@@ -1,4 +1,4 @@
-import {StatePostalCode, ElectionType, CandidateParty, ErrorType} from './enums';
+import {StatePostalCode, ElectionType, CandidateParty, ErrorType, CorrectionType} from './enums';
 
 export interface Error {
   id: number;
@@ -6,6 +6,7 @@ export interface Error {
   dataSource: string;
   errorBoundaryGeoJSON: string;
   errorValue: number;
+  isResolved: boolean;
   precinctsAssociated;
   layer;
 }
@@ -55,6 +56,16 @@ export interface CongressionalDistrict {
   state: StatePostalCode;
   precincts: Precinct[];
   congressionalDistrictGeoJSON;
+}
+
+export interface Correction {
+  id: number;
+  type: CorrectionType;
+  time;
+  comment: string;
+  oldValue;
+  newValue;
+  associatedError;
 }
 
 export interface State {

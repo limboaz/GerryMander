@@ -1,19 +1,20 @@
 export const stateStyle = {
-  color: '#ff7800',
+  color: '#F2E1A6',
   weight: 5,
-  opacity: 0.65
 };
 
 export const districtStyle = {
-  color: '#ff315f',
+  color: '#B2B89C',
   weight: 2,
   opacity: 0.65,
 };
 
 export const precinctStyle = {
-  color: '#3b7693',
+  color: 'rgba(109,109,137,0.67)',
+  fillColor: '#E6A554',
   weight: 2,
-  opacity: 1.00
+  opacity: 1.00,
+  fillOpacity: 0.65
 };
 
 export const ghostStyle = {
@@ -24,19 +25,19 @@ export const ghostStyle = {
 
 export const errorStyle = {
   color: '#3b7693',
-  fillColor: '#932f38',
+  fillColor: '#CB2B17',
   weight: 2,
   fillOpacity: 0.65
 };
 
 export const selectedStyle = {
-  color: '#569335',
+  fillColor: '#599A72',
   weight: 2,
   opacity: 1.00
 };
 
 export const highlightStyle = {
-  color: '#dab037',
+  fillColor: '#3b7693',
   weight: 2,
   opacity: 1.00
 };

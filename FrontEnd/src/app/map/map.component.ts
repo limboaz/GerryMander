@@ -5,13 +5,15 @@ import {icon, Marker} from 'leaflet';
 import {InfoSidenavComponent} from '../info-sidenav/info-sidenav.component';
 import {ErrorListComponent} from '../error-list/error-list.component';
 import {StatePostalCode} from '../../models/enums';
-import {CongressionalDistrict, Precinct, State, Error, ElectionData, NeighborData} from '../../models/models';
+import {CongressionalDistrict, ElectionData, Error, NeighborData, Precinct, State} from '../../models/models';
 import {districtStyle, precinctStyle, selectedStyle, stateStyle} from '../styles';
-import {addNeighbor, removeNeighbor, highlightNeighbors, mergePrecincts, resetNeighbors} from '../../PrecinctHelper';
+import {addNeighbor, highlightNeighbors, loadRequest, removeNeighbor, resetNeighbors, updateBoundary} from '../../PrecinctHelper';
+import {warningMessage, notificationType} from '../../PrecinctHelper';
 import {AttributeMenuComponent} from '../attribute-menu/attribute-menu.component';
 import './leaflet.shpfile';
 import '@geoman-io/leaflet-geoman-free';
 import {MatSnackBar, MatSnackBarRef, SimpleSnackBar} from '@angular/material/snack-bar';
+import {NotifierService} from 'angular-notifier';
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
@@ -44,7 +46,7 @@ export class MapComponent implements AfterViewInit {
   modifyingPrecinct: boolean;
   selectedPrecinct: Precinct;
   otherSelectedPrecinct: Precinct;
-  currentDistrictNum = -1;
+  currentDistrictID = -1;
 
   @ViewChild(InfoSidenavComponent)
   public infoSidenav: InfoSidenavComponent;
@@ -56,7 +58,7 @@ export class MapComponent implements AfterViewInit {
   EditState = EditState;
   private prevGeoJSON: any;
 
-  constructor(private http: HttpClient, private snackBar: MatSnackBar) {
+  constructor(public http: HttpClient, private snackBar: MatSnackBar,  private notifier: NotifierService) {
   }
 
   ngAfterViewInit(): void {
@@ -73,13 +75,13 @@ export class MapComponent implements AfterViewInit {
       zoomControl: false
     });
     this.errorList.map = this.map;
+    this.infoSidenav.errorList = this.errorList;
     tiles.addTo(this.map);
     L.control.zoom({position: 'bottomright'}).addTo(this.map);
     this.marker = L.marker([0, 0]).addTo(this.map);
     this.marker.on('click', () => this.infoSidenav.sidenav.toggle());
-    this.loadRequest(this.http.get<State[]>('/data/getstates'), (states: State[]) => {
+    loadRequest(this.http.get<State[]>('/data/getstates'), (states: State[]) => {
       const statesLayer = L.layerGroup();
-
       states.forEach((s) => {
         const layer = L.geoJSON(JSON.parse(s.stateGeoJSON), {style: stateStyle});
         layer.pm.enable({allowSelfIntersection: false});
@@ -100,19 +102,21 @@ export class MapComponent implements AfterViewInit {
           this.marker.setLatLng([0, 0]);
           this.infoSidenav.sidenav.close();
           this.selectedPrecinct = undefined;
+          this.map.removeLayer(this.errorList.errorsLayer);
         }
       });
-      this.mapControl = L.control.layers({}, {
-        States: statesLayer,
-        Districts: this.districtsLayer,
-        Error: this.errorList.errorsLayer,
-        Precincts: this.precinctsLayer
-      });
+      const addStyle = s => `<span class='leaflet-control-labels'>${s}</span>`;
+      this.mapControl = L.control.layers({}, {}, {collapsed: false});
+      this.mapControl.addOverlay(statesLayer, addStyle('States'));
+      this.mapControl.addOverlay(this.districtsLayer, addStyle('Districts'));
+      this.mapControl.addOverlay(this.errorList.errorsLayer, addStyle('Error'));
+      this.mapControl.addOverlay(this.precinctsLayer, addStyle('Precincts'));
       this.mapControl.addTo(this.map);
 
       this.http.get('/data/getnationalparksdata', {responseType: 'arraybuffer'}).subscribe(d => {
-        const parksLayer = new L.Shapefile(d);
-        this.mapControl.addOverlay(parksLayer, 'National Parks');
+        const parksLayer = new L.Shapefile(d,
+          {onEachFeature: (feature, layer) => layer.bindPopup(feature.properties.UNIT_NAME)});
+        this.mapControl.addOverlay(parksLayer, addStyle('National Parks'));
       });
     });
   }
@@ -129,20 +133,20 @@ export class MapComponent implements AfterViewInit {
       return;
     }
 
-    this.loadRequest(this.http.get<CongressionalDistrict[]>(`/data/getcongbystate?state=${state}`),
+    loadRequest(this.http.get<CongressionalDistrict[]>(`/data/getcongbystate?state=${state}`),
       (congressionalDistricts: CongressionalDistrict[]) => {
         console.log(congressionalDistricts);
         // alternatively display all the precinct boundaries at this point instead of district ones
         const districtGeoJSONs = congressionalDistricts.map(d => {
           d.congressionalDistrictGeoJSON = JSON.parse(d.congressionalDistrictGeoJSON);
-          d.congressionalDistrictGeoJSON.properties = {districtNum: d.id};
+          d.congressionalDistrictGeoJSON.properties = {districtID: d.id, districtNum: d.districtNum};
           return d.congressionalDistrictGeoJSON;
         });
 
         const onEachDistrictFeature = (feature, layer) => {
-          layer.on('click', e => {
-            console.log(feature.properties.districtNum);
-            this.getPrecincts(feature.properties.districtNum);
+          layer.on({
+            click: e => this.getPrecincts(feature.properties.districtID),
+            mouseover: e => layer.bindTooltip('District Number: ' + feature.properties.districtNum).openTooltip()
           });
         };
         const district = L.geoJSON(districtGeoJSONs, {style: districtStyle, onEachFeature: onEachDistrictFeature});
@@ -159,34 +163,42 @@ export class MapComponent implements AfterViewInit {
     });
   }
 
-  getPrecincts(districtNum: number): void {
-    if (this.currentDistrictNum === districtNum) {
+  getPrecincts(districtID: number): void {
+    if (this.currentDistrictID === districtID) {
+      console.log(this.precinctsLayer);
       this.map.addLayer(this.precinctsLayer);
       return;
     }
     this.map.removeLayer(this.precinctsLayer);
 
-    this.loadRequest(this.http.get<Precinct[]>(`/data/getprecinctsbycong?congressionalID=${districtNum}`),
+    loadRequest(this.http.get<Precinct[]>(`/data/getprecinctsbycong?congressionalID=${districtID}`),
       (precincts: Precinct[]) => {
         this.uidToPrecinctMap = {};
-        const precinctLayers = precincts.map(p => {
-          p.precinctGeoJSON = JSON.parse(p.precinctGeoJSON);
-          p.precinctGeoJSON.properties = {uid: p.uid};
-          const precinctLayer = L.geoJSON(p.precinctGeoJSON, {style: precinctStyle});
-          p.layer = precinctLayer;
-          precinctLayer.wrapperPrecinct = p;
-          precinctLayer.on({
-            click: this.onPrecinctClick(p.precinctGeoJSON, precinctLayer),
-            mouseover: this.onPrecinctMouseOver(p.precinctGeoJSON, precinctLayer)
-          });
-          this.uidToPrecinctMap[p.uid] = p;
-          return precinctLayer;
-        });
-        this.currentDistrictNum = districtNum;
         this.precinctsLayer.clearLayers();
-        this.precinctsLayer.addLayer(L.layerGroup(precinctLayers));
+        for (const p of precincts) {
+          this.initializePrecinct(p);
+        }
+        this.currentDistrictID = districtID;
         this.map.addLayer(this.precinctsLayer);
       });
+  }
+
+  initializePrecinct(p: Precinct) {
+    p.precinctGeoJSON = JSON.parse(p.precinctGeoJSON);
+    p.precinctGeoJSON.properties = {uid: p.uid};
+    try {
+      p.layer = L.geoJSON(p.precinctGeoJSON, {style: precinctStyle});
+    } catch (e) {
+      console.log(p.precinctGeoJSON);
+      return;
+    }
+    p.layer.wrapperPrecinct = p;
+    p.layer.on({
+      click: this.onPrecinctClick(p.precinctGeoJSON, p.layer),
+      mouseover: this.onPrecinctMouseOver(p.precinctGeoJSON, p.layer)
+    });
+    this.precinctsLayer.addLayer(p.layer);
+    this.uidToPrecinctMap[p.uid] = p;
   }
 
   onPrecinctClick(feature, layer) {
@@ -195,17 +207,17 @@ export class MapComponent implements AfterViewInit {
 
       if (!this.modifyingPrecinct) {
         this.marker.setLatLng(e.latlng);
-        this.getPrecinctData(layer.wrapperPrecinct, feature.properties.uid);
+        this.getPrecinctData(feature.properties.uid);
       }
     };
   }
 
   onPrecinctMouseOver(feature, layer) {
     return () => layer.bindTooltip('Name: ' + layer.wrapperPrecinct.name
-      + ' Total Population: ' + layer.wrapperPrecinct.populationData.total.toLocaleString()).openTooltip();
+      + '</br> Total Population: ' + layer.wrapperPrecinct.populationData.total.toLocaleString()).openTooltip();
   }
 
-  getPrecinctData(wrapperPrecinct: Precinct, uid: string) {
+  getPrecinctData(uid: string) {
     this.infoSidenav.precinctID = uid;
 
     if (this.uidToPrecinctMap[uid].populationData) {
@@ -216,7 +228,7 @@ export class MapComponent implements AfterViewInit {
       this.infoSidenav.addElectionData(this.uidToPrecinctMap[uid].electionData);
       return;
     }
-    this.loadRequest(this.http.get<ElectionData[]>(`/data/getelectiondata?uid=${uid}`),
+    loadRequest(this.http.get<ElectionData[]>(`/data/getelectiondata?uid=${uid}`),
       (electionData: ElectionData[]) => {
         this.uidToPrecinctMap[uid].electionData = electionData;
         this.infoSidenav.addElectionData(this.uidToPrecinctMap[uid].electionData);
@@ -224,29 +236,46 @@ export class MapComponent implements AfterViewInit {
   }
 
   commit(state: EditState) {
-    console.log(state);
     switch (state) {
       case EditState.MERGING_PRECINCTS:
-          const combined = mergePrecincts(this.selectedPrecinct, this.otherSelectedPrecinct);
-          if (combined) {
-            combined.layer.addTo(this.map);
-            combined.layer.on('click', this.onPrecinctClick(combined.precinctGeoJSON, combined.layer));
-            resetNeighbors(combined, this.uidToPrecinctMap);
-            this.map.removeLayer(this.selectedPrecinct.layer);
-            this.map.removeLayer(this.otherSelectedPrecinct.layer);
-          }
+        if (!this.errorList.selectedError) {
+          this.notifier.notify(notificationType, warningMessage);
           break;
+        }
+
+        const precinctA = this.selectedPrecinct;
+        const precinctB = this.otherSelectedPrecinct;
+        loadRequest(this.http.post(`/boundarycorrection/mergeprecincts?precinctA=${precinctA.uid}&precinctB=${precinctB.uid}` +
+          `&errID=${this.errorList.selectedError.id}`, {}),
+          (precinct: Precinct) => {
+            if (precinct) {
+              this.initializePrecinct(precinct);
+              this.precinctsLayer.removeLayer(precinctA.layer);
+              this.precinctsLayer.removeLayer(precinctB.layer);
+              resetNeighbors(precinct, this.uidToPrecinctMap);
+              this.map.removeLayer(precinctA.layer);
+              this.map.removeLayer(precinctB.layer);
+              this.selectedPrecinct = precinct;
+              this.selectedPrecinct.layer.setStyle(selectedStyle);
+              this.errorList.selectedError.isResolved = true;
+            }
+          });
+        break;
       case EditState.ADDING_NEIGHBOR:
-        addNeighbor(this.selectedPrecinct, this.otherSelectedPrecinct, this.uidToPrecinctMap);
+        addNeighbor(this.http, this.selectedPrecinct, this.otherSelectedPrecinct, this.uidToPrecinctMap);
         break;
       case EditState.REMOVING_NEIGHBOR:
-        removeNeighbor(this.selectedPrecinct, this.otherSelectedPrecinct, this.uidToPrecinctMap);
+        const removed = removeNeighbor(this.http, this.selectedPrecinct, this.otherSelectedPrecinct, this.uidToPrecinctMap);
+        if (!removed) { this.notifier.notify('error', 'Not a valid neighbor to remove'); }
         break;
-      case EditState.EDIT_BOUNDARY:
+      case EditState.EDIT_BOUNDARY || EditState.CREATE_BOUNDARY:
+        if (!this.errorList.selectedError) {
+          this.notifier.notify(notificationType, warningMessage);
+          break;
+        }
         this.prevGeoJSON = undefined;
-        break;
-      case EditState.CREATE_BOUNDARY:
-        this.prevGeoJSON = undefined;
+        updateBoundary(this.http, this.selectedPrecinct, this.selectedPrecinct.layer.toGeoJSON(), this.errorList.selectedError.id);
+        this.errorList.selectedError.isResolved = true;
         break;
       default:
         console.log('Invalid State');
@@ -280,20 +309,6 @@ export class MapComponent implements AfterViewInit {
         this.selectPrecinct(precinct);
       });
     }
-  }
-
-  loadRequest(httpRequest, successCallback) {
-    const leafletStyle = document.getElementById('leafletStyle');
-    leafletStyle.innerHTML = '';
-    leafletStyle.appendChild(document.createTextNode('.leaflet-interactive, #map { cursor: wait !important; }'));
-    httpRequest.subscribe(d => {
-      leafletStyle.innerHTML = '';
-      leafletStyle.appendChild(document.createTextNode('.leaflet-interactive, #map { cursor: auto; }'));
-      successCallback(d);
-    }, () => {
-      leafletStyle.innerHTML = '';
-      leafletStyle.appendChild(document.createTextNode('.leaflet-interactive, #map { cursor: auto; }'));
-    });
   }
 
   cancelState() {

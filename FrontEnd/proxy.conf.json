@@ -2,5 +2,9 @@
   "/data": {
     "target": "http://localhost:8080",
     "secure": false
+  },
+  "/boundarycorrection": {
+    "target": "http://localhost:8080",
+    "secure": false
   }
 }

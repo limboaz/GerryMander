@@ -36,7 +36,6 @@
 .sidenav-forms {
   display: flex;
   flex-direction: column;
-  background-color: #b33163;
   width: max-content;
   margin: 15px;
   color: black;
@@ -48,7 +47,6 @@
 .map-edit-buttons {
   display: flex;
   flex-direction: column;
-  background-color: #ff4294;
   width: max-content;
   margin: 15px;
   color: black;

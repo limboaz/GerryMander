@@ -1,8 +1,10 @@
 import {Component, OnInit, Output, EventEmitter} from '@angular/core';
 import {Error} from '../../models/models';
 import * as L from 'leaflet';
-import {errorStyle, selectedStyle} from '../styles';
+import {errorStyle} from '../styles';
 import {ErrorType} from '../../models/enums';
+import {HttpClient} from '@angular/common/http';
+import {loadRequest} from '../../PrecinctHelper';
 
 @Component({
   selector: 'app-error-list',
@@ -13,17 +15,25 @@ export class ErrorListComponent implements OnInit {
   public currentErrors = {};
   public errorKeys = Object.keys(ErrorType).filter(e => !isNaN(Number(ErrorType[e])));
   public errorsLayer = L.layerGroup();
+  public selectedError: Error;
   public map;
+  errorTypeMap = {};
   @Output() notify = new EventEmitter();
-  constructor() {}
+
+  constructor(private http: HttpClient) {
+    const capitalizeFirst = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+    for (const key of this.errorKeys) {
+      this.errorTypeMap[key] = key.toLowerCase().split(/_/g).map(capitalizeFirst).join(' ');
+    }
+  }
 
   ngOnInit(): void {
   }
 
   goToError(error: Error) {
-    error.layer.setStyle(selectedStyle);
     this.map.fitBounds(error.layer.getBounds());
     this.map.addLayer(this.errorsLayer);
+    this.selectedError = error;
   }
 
   removeError(error: Error) {
@@ -48,5 +58,17 @@ export class ErrorListComponent implements OnInit {
       }
     }
     return this.errorsLayer;
+  }
+
+  defineGhostPrecinct(error: Error) {
+    loadRequest(this.http.post('/boundarycorrection/defineghostprecinct', {errID: error.id}), id => {
+      const p = {uid: id, precinctGeoJSON: JSON.stringify(error.errorBoundaryGeoJSON)};
+      this.notify.emit(p);
+      error.isResolved = true;
+    });
+  }
+
+  resolveError(error: Error) {
+    error.isResolved = true;
   }
 }

@@ -6,13 +6,14 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {LayoutModule} from '@angular/cdk/layout';
 import {MapComponent} from './map/map.component';
 import {HttpClientModule} from '@angular/common/http';
-import {AttributeMenuComponent} from './attribute-menu/attribute-menu.component';
+import {AttributeMenuComponent, CorrectionsLogComponent} from './attribute-menu/attribute-menu.component';
 import {MaterialModules} from './material.module';
 import {InfoSidenavComponent} from './info-sidenav/info-sidenav.component';
 import {ErrorListComponent} from './error-list/error-list.component';
 import { DialogButtonComponent } from './dialog-button/dialog-button.component';
 import {DialogButtonDialogComponent} from './dialog-button/dialog-button.component';
 import {FormsModule} from '@angular/forms';
+import { NotifierModule } from 'angular-notifier';
 
 
 @NgModule({
@@ -23,7 +24,8 @@ import {FormsModule} from '@angular/forms';
     InfoSidenavComponent,
     ErrorListComponent,
     DialogButtonComponent,
-    DialogButtonDialogComponent
+    DialogButtonDialogComponent,
+    CorrectionsLogComponent
   ],
   imports: [
     BrowserModule,
@@ -31,7 +33,8 @@ import {FormsModule} from '@angular/forms';
     FormsModule,
     LayoutModule,
     HttpClientModule,
-    MaterialModules
+    MaterialModules,
+    NotifierModule.withConfig({position: {horizontal: {position: 'middle'}, vertical: {position: 'bottom'}}})
   ],
   providers: [],
   bootstrap: [AppComponent]
