@@ -1,25 +1,34 @@
-<mat-accordion multi="true">
-  <mat-expansion-panel *ngFor="let errorType of errorKeys" class="expansion-panel">
-    <mat-expansion-panel-header>
-      <mat-panel-title>
-        {{errorType}}
-      </mat-panel-title>
-      <mat-panel-description>
-      </mat-panel-description>
-    </mat-expansion-panel-header>
+<mat-expansion-panel [expanded]="true" style="overflow-y: auto; max-height: 77vh">
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      <strong>Potential errors detected</strong>
+    </mat-panel-title>
+  </mat-expansion-panel-header>
+  <mat-accordion multi="true">
+    <mat-expansion-panel *ngFor="let errorType of errorKeys" class="expansion-panel">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          {{errorTypeMap[errorType]}}
+        </mat-panel-title>
+      </mat-expansion-panel-header>
 
-    <div *ngIf="currentErrors[errorType]">
-      <mat-expansion-panel *ngFor="let error of currentErrors[errorType]">
-        <mat-expansion-panel-header (click)="goToError(error)">
-          <mat-panel-title>
-            ID: {{error.id}}
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-        Data Source:
-        <a href="https://{{error.dataSource}}" target="_blank">
-          <button mat-button>{{error.dataSource}}</button>
-        </a>
-      </mat-expansion-panel>
-    </div>
-  </mat-expansion-panel>
-</mat-accordion>
+      <div *ngIf="currentErrors[errorType]">
+        <mat-expansion-panel *ngFor="let error of currentErrors[errorType]" [style.background-color]="error.isResolved ? '#78BD8F' : ''">
+          <mat-expansion-panel-header (click)="goToError(error)">
+            <mat-panel-title>ID: {{error.id}}</mat-panel-title>
+            <mat-panel-description *ngIf="error.isResolved">Resolved</mat-panel-description>
+          </mat-expansion-panel-header>
+          Data Source:
+          <a href="https://{{error.dataSource}}" target="_blank">
+            <button mat-button>{{error.dataSource}}</button>
+          </a>
+          <div><br/>
+            <button mat-raised-button color="accent" *ngIf="errorType === 'UNASSIGNED_AREA'" (click)="defineGhostPrecinct(error)">
+              Define Ghost Precinct
+            </button>
+          </div>
+        </mat-expansion-panel>
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
+</mat-expansion-panel>

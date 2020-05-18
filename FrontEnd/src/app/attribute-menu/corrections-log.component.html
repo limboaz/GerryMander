@@ -1,10 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+<table mat-table [dataSource]="dataSource">
+  <ng-container matColumnDef="id">
+    <th mat-header-cell *matHeaderCellDef> ID </th>
+    <td mat-cell *matCellDef="let correction"> {{correction.id}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="type">
+    <th mat-header-cell *matHeaderCellDef> Type </th>
+    <td mat-cell *matCellDef="let correction"> {{correction.type}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="time">
+    <th mat-header-cell *matHeaderCellDef> Date Corrected </th>
+    <td mat-cell *matCellDef="let correction"> {{correction.time}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="comment">
+    <th mat-header-cell *matHeaderCellDef> Comment </th>
+    <td mat-cell *matCellDef="let correction"> {{correction.comment}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="oldvalue">
+    <th mat-header-cell *matHeaderCellDef> Old Value </th>
+    <td mat-cell *matCellDef="let correction"> {{correction.oldValue}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="newvalue">
+    <th mat-header-cell *matHeaderCellDef> New Value </th>
+    <td mat-cell *matCellDef="let correction"> {{correction.newValue}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef=errorid>
+    <th mat-header-cell *matHeaderCellDef> Associated Error </th>
+    <td mat-cell *matCellDef="let correction"> {{correction.associatedError}} </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="['type', 'time', 'comment', 'oldvalue', 'newvalue', 'errorid']"></tr>
+  <tr mat-row *matRowDef="let row; columns: ['type', 'time', 'comment', 'oldvalue', 'newvalue', 'errorid'];"></tr>
+</table>
+
+<mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>

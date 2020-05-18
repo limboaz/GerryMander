@@ -1,5 +1,9 @@
 import {Precinct} from './models/models';
 import {highlightStyle} from './app/styles';
+import {stringify} from 'querystring';
+
+export const warningMessage = 'Please select the corresponding error this will fix first and try again';
+export const notificationType = 'warning';
 
 function getNeighbors(precinct: Precinct, currentPrecincts): Precinct[] {
   if (!precinct.neighbors) {
@@ -20,15 +24,43 @@ export function resetNeighbors(precinct: Precinct, currentPrecincts) {
   }
 }
 
-export function addNeighbor(precinct: Precinct, newNeighbor: Precinct, currentPrecincts) {
-  // Add newNeighbor as neighbor to Precinct and vice versa
-  highlightNeighbors(precinct, currentPrecincts);
+export function addNeighbor(http, precinct: Precinct, newNeighbor: Precinct, currentPrecincts) {
+  loadRequest(http.post('/datacorrection/addneighbor', {uid: precinct.uid, neighborID: newNeighbor.uid}),
+    () => {
+      precinct.neighbors.push({id: -1, neighborID: newNeighbor.uid});
+      highlightNeighbors(precinct, currentPrecincts);
+    });
 }
 
-export function removeNeighbor(precinct: Precinct, oldNeighbor: Precinct, currentPrecincts) {
-  // remove neighbor
+export function removeNeighbor(http, precinct: Precinct, oldNeighbor: Precinct, currentPrecincts) {
+  if (!getNeighbors(precinct, currentPrecincts).includes(oldNeighbor)) {
+    return false;
+  }
+  loadRequest(http.post('/datacorrection/deleteneighbor', {uid: precinct.uid, neighborID: oldNeighbor.uid}),
+    () => {
+      resetNeighbors(precinct, currentPrecincts);
+      precinct.neighbors = precinct.neighbors.filter(p => p.neighborID !== oldNeighbor.uid);
+      highlightNeighbors(precinct, currentPrecincts);
+    });
+  return true;
 }
 
-export function mergePrecincts(precinctA: Precinct, precinctB: Precinct): Precinct {
-  return undefined;
+export function updateBoundary(http, precinct: Precinct, newBoundary, errID) {
+  newBoundary = JSON.stringify(newBoundary.features[0].geometry);
+  loadRequest(http.post('/boundarycorrection/updateprecinctboundary', {uid: precinct.uid, errID, newBoundary}),
+    () => console.log('I finished updating'));
+}
+
+export function loadRequest(httpRequest, successCallback) {
+  const leafletStyle = document.getElementById('leafletStyle');
+  leafletStyle.innerHTML = '';
+  leafletStyle.appendChild(document.createTextNode('.leaflet-interactive, #map { cursor: wait !important; }'));
+  httpRequest.subscribe(d => {
+    leafletStyle.innerHTML = '';
+    leafletStyle.appendChild(document.createTextNode('.leaflet-interactive, #map { cursor: auto; }'));
+    successCallback(d);
+  }, () => {
+    leafletStyle.innerHTML = '';
+    leafletStyle.appendChild(document.createTextNode('.leaflet-interactive, #map { cursor: auto; }'));
+  });
 }
