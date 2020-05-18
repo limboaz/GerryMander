@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import java.sql.Date;
 import java.util.List;
 
@@ -22,13 +23,7 @@ public class DataCorrectionService {
     @PersistenceContext
     EntityManager em;
 
-    /*
-     * if there's an error, we can throw an exception. Exception handling can happen later in
-     * the implementation stage, as we want to see what's going on with db and figure out what
-     * exceptions we need to handle. The controller will return different status code with
-     * different exceptions.
-     */
-
+    @Transactional
     public void editElectionData(Long errID, String uid, List<ElectionData> electionData){
         logger.info("editElectionData: errorID = " + errID + ", uid = " + uid);
         DataError err = em.find(DataError.class, errID);
@@ -53,20 +48,24 @@ public class DataCorrectionService {
         }
     }
 
+    @Transactional
     public void editPopulationData(Long errID, String uid, PopulationData populationData){
         logger.info("editPopulationData: errID = " + errID + ", uid = " + uid);
         DataError err = em.find(DataError.class, errID);
         if(err != null){
             try{
-                em.merge(populationData);
-                err.setResolved(true);
-                em.merge(err);
-
+                PopulationData oldPop = em.find(PopulationData.class, uid);
                 Correction correction = new Correction();
                 correction.setComment("Edited population data with id " + uid + ", errID " + errID);
                 correction.setTime(new Date(System.currentTimeMillis()));
+                correction.setOldValue(oldPop.toString());
+                correction.setNewValue(populationData.toString());
                 correction.setAssociatedError(err);
                 correction.setType(CorrectionType.POPULATION_DATA);
+
+                em.merge(populationData);
+                err.setResolved(true);
+                em.merge(err);
                 em.persist(correction);
             }catch (Exception e){
                 e.printStackTrace();
@@ -76,6 +75,7 @@ public class DataCorrectionService {
         }
     }
 
+    @Transactional
     public void deleteNeighbor(String uid, String neighborID){
         logger.info("deleteNeighbor: uid = " + uid + ", neighborID = " + neighborID);
         Precinct precinct = em.find(Precinct.class, uid);
@@ -83,13 +83,15 @@ public class DataCorrectionService {
             try{
                 NeighborData neighbor = em.find(NeighborData.class, neighborID);
                 precinct.getNeighbors().remove(neighbor);
-                em.merge(precinct);
-                em.remove(neighbor);
 
                 Correction correction = new Correction();
                 correction.setComment("Deleted neighbor data with id " + neighborID + ", uid = " + uid);
+                correction.setOldValue(neighborID);
                 correction.setTime(new Date(System.currentTimeMillis()));
                 correction.setType(CorrectionType.NEIGHBOR_CHANGE);
+
+                em.merge(precinct);
+                em.remove(neighbor);
                 em.persist(correction);
             }catch(Exception e){
                 e.printStackTrace();
@@ -100,6 +102,7 @@ public class DataCorrectionService {
         }
     }
 
+    @Transactional
     public void addNeighbor(String uid, String neighborID){
         logger.info("addNeighbor: uid = " + uid + ", neighborID" + neighborID);
         Precinct precinct = em.find(Precinct.class, uid);
@@ -114,6 +117,7 @@ public class DataCorrectionService {
                 correction.setComment("Added neighbor data with id " + neighborID + ", uid = " + uid);
                 correction.setTime(new Date(System.currentTimeMillis()));
                 correction.setType(CorrectionType.NEIGHBOR_CHANGE);
+                correction.setNewValue(neighborID);
                 em.persist(correction);
             }catch(Exception e){
                 e.printStackTrace();

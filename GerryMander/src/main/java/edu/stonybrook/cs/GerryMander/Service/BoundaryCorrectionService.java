@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.transaction.Transactional;
 import java.sql.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ public class BoundaryCorrectionService {
     @PersistenceContext
     private EntityManager em;
 
+    @Transactional
     public Precinct mergePrecincts(Long errID, String precinctA, String precinctB){
         logger.info("mergePrecincts: errID = " + errID + ", precinctA = " + precinctA + ", precinctB = " + precinctB);
 
@@ -79,6 +81,8 @@ public class BoundaryCorrectionService {
                 Correction correction = new Correction();
                 correction.setComment("Merged precincts with id " + precinctA + ", " + precinctB + ", errID " + errID);
                 correction.setTime(new Date(System.currentTimeMillis()));
+                correction.setOldValue("precinct A:" + precinctA + ", precinct B: " + precinctB);
+                correction.setNewValue("New precinct:" + uid);
                 correction.setAssociatedError(err);
                 correction.setType(CorrectionType.MERGE_PRECINCT);
                 em.persist(correction);
@@ -93,11 +97,13 @@ public class BoundaryCorrectionService {
         return null;
     }
 
+    @Transactional
     public void updatePrecinctBoundary(Long errID, String uid, String newBoundary){
         logger.info("updatePrecinctBoundary: errID = " + errID + ", uid = " + uid);
         Precinct precinct = em.find(Precinct.class, uid);
         if(precinct != null){
             try {
+                String oldBoundary = precinct.getPrecinctGeoJSON();
                 precinct.setPrecinctGeoJSON(newBoundary);
                 em.merge(precinct);
 
@@ -108,6 +114,8 @@ public class BoundaryCorrectionService {
                 Correction correction = new Correction();
                 correction.setComment("Updated precinct boundary " + uid + ", errID " + errID);
                 correction.setTime(new Date(System.currentTimeMillis()));
+                correction.setOldValue(oldBoundary);
+                correction.setNewValue(newBoundary);
                 correction.setAssociatedError(err);
                 correction.setType(CorrectionType.BOUNDARY_CHANGE);
                 em.persist(correction);
@@ -120,6 +128,7 @@ public class BoundaryCorrectionService {
         }
     }
 
+    @Transactional
     public String defineGhostPrecinct(Long errID){
         logger.info("defineGhostPrecinct: errID = " + errID);
         BoundaryError err = em.find(BoundaryError.class, errID);
@@ -136,6 +145,7 @@ public class BoundaryCorrectionService {
                 Correction correction = new Correction();
                 correction.setComment("Generating ghost precinct with id " + uid + ", errID " + errID);
                 correction.setTime(new Date(System.currentTimeMillis()));
+                correction.setNewValue(uid);
                 correction.setAssociatedError(err);
                 correction.setType(CorrectionType.GHOST_DESIGNATION);
                 em.persist(correction);
