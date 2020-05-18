@@ -53,6 +53,7 @@ public class BoundaryCorrectionService {
                 Precinct mergedPrecinct = new Precinct();
                 mergedPrecinct.setPrecinctGeoJSON(mergedBoundary);
                 String uid = preA.getState().name() + "_" + preA.getCounty() + "_" + preA.getName() + preB.getName();
+                uid = uid.replaceAll(" ", "_").toUpperCase();
                 mergedPrecinct.setUid(uid);
 
                 PopulationData mergedPop = PopulationData.mergePop(preA, preB, mergedPrecinct);
