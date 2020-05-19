@@ -228,6 +228,7 @@ export class MapComponent implements AfterViewInit {
       this.infoSidenav.addElectionData(this.uidToPrecinctMap[uid].electionData);
       return;
     }
+    this.infoSidenav.addElectionData([]);
     loadRequest(this.http.get<ElectionData[]>(`/data/getelectiondata?uid=${uid}`),
       (electionData: ElectionData[]) => {
         this.uidToPrecinctMap[uid].electionData = electionData;
@@ -257,7 +258,7 @@ export class MapComponent implements AfterViewInit {
               this.map.removeLayer(precinctB.layer);
               this.selectedPrecinct = precinct;
               this.selectedPrecinct.layer.setStyle(selectedStyle);
-              this.errorList.selectedError.isResolved = true;
+              this.errorList.selectedError.resolved = true;
             }
           });
         break;
@@ -275,7 +276,7 @@ export class MapComponent implements AfterViewInit {
         }
         this.prevGeoJSON = undefined;
         updateBoundary(this.http, this.selectedPrecinct, this.selectedPrecinct.layer.toGeoJSON(), this.errorList.selectedError.id);
-        this.errorList.selectedError.isResolved = true;
+        this.errorList.selectedError.resolved = true;
         break;
       default:
         console.log('Invalid State');
@@ -353,6 +354,14 @@ export class MapComponent implements AfterViewInit {
       case EditState.EDIT_BOUNDARY:
         this.selectedPrecinct.layer.pm.enable({allowSelfIntersection: false});
         break;
+    }
+  }
+
+  goToPrecinct(precinctUid) {
+    if (this.uidToPrecinctMap[precinctUid]) {
+      this.map.addLayer(this.uidToPrecinctMap[precinctUid].layer);
+      this.map.fitBounds(this.uidToPrecinctMap[precinctUid].layer.getBounds());
+      this.selectPrecinct(this.uidToPrecinctMap[precinctUid]);
     }
   }
 }

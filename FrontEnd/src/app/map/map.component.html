@@ -19,7 +19,7 @@
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
       <mat-divider></mat-divider>
-      <app-error-list (notify)="initializePrecinct($event)"></app-error-list>
+      <app-error-list (notify)="initializePrecinct($event)" (goToPrecinct)="goToPrecinct($event)"></app-error-list>
       <mat-form-field class="drop-down">
         <mat-label>State</mat-label>
         <mat-select>

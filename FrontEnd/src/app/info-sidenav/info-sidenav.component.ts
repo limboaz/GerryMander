@@ -69,7 +69,7 @@ export class InfoSidenavComponent implements OnInit {
     this.http.post(`/datacorrection/editelectiondata?uid=${this.precinctID}&errID=${this.errorList.selectedError.id}`,
       JSON.stringify(this.electionData),
       {headers: new HttpHeaders({'Content-Type': 'application/json'})})
-      .subscribe(() => this.errorList.selectedError.isResolved = true);
+      .subscribe(() => this.errorList.selectedError.resolved = true);
   }
 
   commitPopulationData() {
@@ -80,6 +80,6 @@ export class InfoSidenavComponent implements OnInit {
     this.http.post(`/datacorrection/editpopulationdata?uid=${this.precinctID}&errID=${this.errorList.selectedError.id}`,
       JSON.stringify(this.populationData),
       {headers: new HttpHeaders({'Content-Type': 'application/json'})})
-      .subscribe(() => this.errorList.selectedError.isResolved = true);
+      .subscribe(() => this.errorList.selectedError.resolved = true);
   }
 }

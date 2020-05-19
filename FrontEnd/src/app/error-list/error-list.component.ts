@@ -19,6 +19,7 @@ export class ErrorListComponent implements OnInit {
   public map;
   errorTypeMap = {};
   @Output() notify = new EventEmitter();
+  @Output() goToPrecinct = new EventEmitter();
 
   constructor(private http: HttpClient) {
     const capitalizeFirst = (s) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -31,13 +32,12 @@ export class ErrorListComponent implements OnInit {
   }
 
   goToError(error: Error) {
-    this.map.fitBounds(error.layer.getBounds());
-    this.map.addLayer(this.errorsLayer);
+    if (error.errorBoundaryGeoJSON) {
+      this.map.fitBounds(error.layer.getBounds());
+      this.map.addLayer(error.layer);
+    }
+    this.goToPrecinct.emit(error.precinctUid);
     this.selectedError = error;
-  }
-
-  removeError(error: Error) {
-    this.currentErrors[error.type] = this.currentErrors[error.type].filter(e => e !== error);
   }
 
   addErrors(errors: Error[]) {
@@ -64,11 +64,11 @@ export class ErrorListComponent implements OnInit {
     loadRequest(this.http.post('/boundarycorrection/defineghostprecinct', {errID: error.id}), id => {
       const p = {uid: id, precinctGeoJSON: JSON.stringify(error.errorBoundaryGeoJSON)};
       this.notify.emit(p);
-      error.isResolved = true;
+      error.resolved = true;
     });
   }
 
   resolveError(error: Error) {
-    error.isResolved = true;
+    error.resolved = true;
   }
 }

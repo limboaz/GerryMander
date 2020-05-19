@@ -6,8 +6,8 @@ export interface Error {
   dataSource: string;
   errorBoundaryGeoJSON: string;
   errorValue: number;
-  isResolved: boolean;
-  precinctsAssociated;
+  resolved: boolean;
+  precinctUid;
   layer;
 }
 
@@ -23,6 +23,7 @@ export interface ElectionData {
   candidate: string;
   party: CandidateParty;
   voteTotal: number;
+  precinct;
 }
 
 export interface PopulationData {
@@ -35,6 +36,7 @@ export interface PopulationData {
   nativeAmerican: number;
   pacificIslander: number;
   other: number;
+  precinct;
 }
 
 export interface Precinct {
