@@ -11,7 +11,7 @@ import java.util.Set;
 
 @Entity
 public class NeighborData {
-    private long id;
+    private String id;
     private Precinct precinct;
     private String neighborID;
 
@@ -22,19 +22,30 @@ public class NeighborData {
         this.neighborID = neighborID;
     }
 
-    public static List<NeighborData> mergeNeighbors(List<NeighborData> neighborA, List<NeighborData> neighborB){
+    public NeighborData(String id, Precinct precinct, String neighborID){
+        this.id = id;
+        this.precinct = precinct;
+        this.neighborID = neighborID;
+    }
+
+    public static List<NeighborData> mergeNeighbors(Precinct precinct, List<NeighborData> neighborA, List<NeighborData> neighborB){
         Set<NeighborData> mergedNeighbors = new HashSet<>(neighborA);
         mergedNeighbors.addAll(neighborB);
-        return new ArrayList<>(mergedNeighbors);
+        List<NeighborData> mergedNeighborList = new ArrayList<>();
+        int counter = 0;
+        for(NeighborData neighbor: mergedNeighbors) {
+            mergedNeighborList.add(new NeighborData(precinct.getUid() + "_NEIGHBOR_" + counter, precinct, neighbor.getNeighborID()));
+        }
+        return mergedNeighborList;
     }
 
     @Id
-    @GeneratedValue
-    public long getId() {
+    @Column(length = 100)
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

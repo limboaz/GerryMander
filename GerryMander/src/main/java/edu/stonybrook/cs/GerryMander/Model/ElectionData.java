@@ -11,7 +11,7 @@ import java.util.*;
 @Entity
 @JsonIgnoreProperties("precinct")
 public class ElectionData {
-    private long id;
+    private String id;
     private int year;
     private ElectionType type;
     private String candidate;
@@ -21,7 +21,8 @@ public class ElectionData {
 
     public ElectionData(){}
 
-    public ElectionData(int year, ElectionType type, String candidate, CandidateParty party, int voteTotal, Precinct precinct){
+    public ElectionData(String id, int year, ElectionType type, String candidate, CandidateParty party, int voteTotal, Precinct precinct){
+        this.id = id;
         this.year = year;
         this.type = type;
         this.candidate = candidate;
@@ -30,28 +31,39 @@ public class ElectionData {
         this.precinct = precinct;
     }
 
-    public static List<ElectionData> mergeElection(List<ElectionData> electA, List<ElectionData> electB){
+    public static List<ElectionData> mergeElection(List<ElectionData> electA, List<ElectionData> electB, Precinct precinct){
+        int counter = 0;
         Map<String, ElectionData> mergedElection = new HashMap<>();
-        for(ElectionData item: electA)
-            mergedElection.put(item.getYear() + item.getCandidate(), item);
+        for(ElectionData item: electA) {
+            ElectionData newItem = new ElectionData(precinct.getUid() + "_ELECTION_" + counter, item.year, item.type, item.candidate,
+                    item.party, item.voteTotal, precinct);
+            counter++;
+            mergedElection.put(newItem.getYear() + newItem.getCandidate(), newItem);
+        }
         for(ElectionData item: electB){
             if(mergedElection.containsKey(item.getYear() + item.getCandidate())){
                 ElectionData prev = mergedElection.get(item.getYear() + item.getCandidate());
-                mergedElection.put(item.getYear() + item.getCandidate(), new ElectionData(item.getYear(), item.getType(), item.getCandidate(), item.getParty(), item.getVoteTotal() + prev.getVoteTotal(), item.getPrecinct()));
+                ElectionData newItem = new ElectionData(precinct.getUid() + "_ELECTION_" + counter, item.year, item.type, item.candidate,
+                        item.party, item.voteTotal + prev.getVoteTotal(), precinct);
+                mergedElection.put(item.getYear() + item.getCandidate(), newItem);
+                counter++;
             }else{
-                mergedElection.put(item.getYear() + item.getCandidate(), item);
+                ElectionData newItem = new ElectionData(precinct.getUid() + "_ELECTION_" + counter, item.year, item.type, item.candidate,
+                        item.party, item.voteTotal, precinct);
+                counter++;
+                mergedElection.put(newItem.getYear() + newItem.getCandidate(), newItem);
             }
         }
         return new ArrayList<>(mergedElection.values());
     }
 
     @Id
-    @GeneratedValue
-    public long getId() {
+    @Column(length = 100)
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -119,4 +131,5 @@ public class ElectionData {
                 ", voteTotal=" + voteTotal +
                 '}';
     }
+
 }

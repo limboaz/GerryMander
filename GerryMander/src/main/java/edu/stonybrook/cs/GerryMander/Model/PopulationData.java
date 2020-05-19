@@ -5,10 +5,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 
+
 @Entity
 @JsonIgnoreProperties("precinct")
 public class PopulationData {
-    private long id;
+    private String id;
     private int total;
     private int white;
     private int black;
@@ -21,8 +22,9 @@ public class PopulationData {
 
     public PopulationData(){}
 
-    public PopulationData(int total, int white, int black, int asian, int hispanic, int nativeAmerican,
+    public PopulationData(String id, int total, int white, int black, int asian, int hispanic, int nativeAmerican,
                           int pacificIslander, int other, Precinct precinct){
+        this.id = id;
         this.total = total;
         this.white = white;
         this.black = black;
@@ -37,18 +39,19 @@ public class PopulationData {
     static public PopulationData mergePop(Precinct precinctA, Precinct precinctB, Precinct mergedPrecinct){
         PopulationData popA = precinctA.getPopulationData();
         PopulationData popB = precinctB.getPopulationData();
-        return new PopulationData(popA.getTotal() + popB.getTotal(), popA.getWhite() + popB.getWhite(), popA.getBlack() + popB.getBlack(),
+
+        return new PopulationData(mergedPrecinct.getUid() + "_POP_" + popA.getTotal(), popA.getTotal() + popB.getTotal(), popA.getWhite() + popB.getWhite(), popA.getBlack() + popB.getBlack(),
                 popA.getAsian() + popB.getAsian(), + popA.getHispanic() + popB.getHispanic(), + popA.getNativeAmerican() + popB.getNativeAmerican(),
                 popA.getPacificIslander() + popB.getPacificIslander(), popA.getOther() + popB.getOther(), mergedPrecinct);
     }
 
     @Id
-    @GeneratedValue
-    public long getId() {
+    @Column(length = 100)
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

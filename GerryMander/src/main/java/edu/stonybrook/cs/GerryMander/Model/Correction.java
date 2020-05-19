@@ -51,6 +51,7 @@ public class Correction {
         this.comment = comment;
     }
 
+    @Lob
     public String getOldValue() {
         return oldValue;
     }
@@ -59,6 +60,7 @@ public class Correction {
         this.oldValue = oldValue;
     }
 
+    @Lob
     public String getNewValue() {
         return newValue;
     }

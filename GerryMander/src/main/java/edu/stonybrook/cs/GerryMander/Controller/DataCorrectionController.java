@@ -64,15 +64,15 @@ public class DataCorrectionController {
     }
 
     @PostMapping("/addneighbor")
-    public ResponseEntity<Object> addNeighbor(@RequestBody Map<String, String> req){
+    public ResponseEntity<String> addNeighbor(@RequestBody Map<String, String> req){
         HttpStatus status = HttpStatus.OK;
 
         String uid = req.get("uid");
         String neighborID = req.get("neighborID");
 
-        dataCorrectionService.addNeighbor(uid, neighborID);
+        String newNeighborID = dataCorrectionService.addNeighbor(uid, neighborID);
 
-        return new ResponseEntity<>(status);
+        return new ResponseEntity<>(newNeighborID, status);
     }
 
 }

@@ -27,10 +27,14 @@ public class DataCorrectionService {
     public void editElectionData(Long errID, String uid, List<ElectionData> electionData){
         logger.info("editElectionData: errorID = " + errID + ", uid = " + uid);
         DataError err = em.find(DataError.class, errID);
+        Precinct precinct = em.find(Precinct.class, uid);
         if(err != null){
             try{
-                for(ElectionData item: electionData)
+                for(ElectionData item: electionData) {
+                    item.setPrecinct(precinct);
+                    logger.info("item: " + item.getPrecinct().getUid());
                     em.merge(item);
+                }
                 err.setResolved(true);
                 em.merge(err);
 
@@ -82,7 +86,7 @@ public class DataCorrectionService {
         if(precinct != null) {
             try{
                 NeighborData neighbor = em.find(NeighborData.class, neighborID);
-                precinct.getNeighbors().remove(neighbor);
+                //precinct.getNeighbors().remove(neighbor);
 
                 Correction correction = new Correction();
                 correction.setComment("Deleted neighbor data with id " + neighborID + ", uid = " + uid);
@@ -90,7 +94,7 @@ public class DataCorrectionService {
                 correction.setTime(new Date(System.currentTimeMillis()));
                 correction.setType(CorrectionType.NEIGHBOR_CHANGE);
 
-                em.merge(precinct);
+                //em.merge(precinct);
                 em.remove(neighbor);
                 em.persist(correction);
             }catch(Exception e){
@@ -103,27 +107,27 @@ public class DataCorrectionService {
     }
 
     @Transactional
-    public void addNeighbor(String uid, String neighborID){
+    public String addNeighbor(String uid, String neighborID){
         logger.info("addNeighbor: uid = " + uid + ", neighborID" + neighborID);
         Precinct precinct = em.find(Precinct.class, uid);
         if(precinct != null){
-            try{
-                NeighborData neighborData = new NeighborData(precinct, neighborID);
-                em.persist(neighborData);
-                precinct.getNeighbors().add(neighborData);
-                em.merge(precinct);
+            NeighborData neighborData = new NeighborData(precinct, neighborID);
+            int seq = precinct.getNeighbors().size() + 1;
+            String newNeighborID = precinct.getUid() + "_NEIGHBOR_" + seq;
+            neighborData.setId(newNeighborID);
+            precinct.getNeighbors().add(neighborData);
+            em.persist(neighborData);
+            em.merge(precinct);
 
-                Correction correction = new Correction();
-                correction.setComment("Added neighbor data with id " + neighborID + ", uid = " + uid);
-                correction.setTime(new Date(System.currentTimeMillis()));
-                correction.setType(CorrectionType.NEIGHBOR_CHANGE);
-                correction.setNewValue(neighborID);
-                em.persist(correction);
-            }catch(Exception e){
-                e.printStackTrace();
-            }
-        }else{
-            logger.error("addNeighbor: uid = " + uid + ", precinct doesn't exist in database.");
+            Correction correction = new Correction();
+            correction.setComment("Added neighbor data with id " + neighborID + ", uid = " + uid);
+            correction.setTime(new Date(System.currentTimeMillis()));
+            correction.setType(CorrectionType.NEIGHBOR_CHANGE);
+            correction.setNewValue(neighborID);
+            em.persist(correction);
+
+            return newNeighborID;
         }
+        throw new IllegalArgumentException();
     }
 }

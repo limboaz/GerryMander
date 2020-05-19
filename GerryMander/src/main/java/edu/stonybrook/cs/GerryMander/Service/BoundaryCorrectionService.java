@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
+import javax.persistence.FlushModeType;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
@@ -40,6 +41,7 @@ public class BoundaryCorrectionService {
         List<Precinct> precincts = query.getResultList();
         Precinct preA = precincts.get(0);
         Precinct preB = precincts.get(1);
+        em.setFlushMode(FlushModeType.COMMIT);
 
         if (query.getResultList().size() > 0) {
             GeoJsonReader reader = new GeoJsonReader();
@@ -61,19 +63,15 @@ public class BoundaryCorrectionService {
 
                 mergedPrecinct.setState(preA.getState());
                 mergedPrecinct.setCongDistrictNum(preA.getCongDistrictNum());
-                mergedPrecinct.setName(preA.getName() + preB.getName());
+                mergedPrecinct.setCongressionalDistrict(preA.getCongressionalDistrict());
+                mergedPrecinct.setName(preA.getName() + " + " + preB.getName());
                 mergedPrecinct.setCounty(preA.getCounty());
 
-                List<Error> mergedErrors = Stream.concat(preA.getErrors().stream(), preB.getErrors().stream()).collect(Collectors.toList());
-                mergedPrecinct.setErrors(mergedErrors);
-
-                List<ElectionData> mergedElection = ElectionData.mergeElection(preA.getElectionData(), preB.getElectionData());
+                List<ElectionData> mergedElection = ElectionData.mergeElection(preA.getElectionData(), preB.getElectionData(), mergedPrecinct);
                 mergedPrecinct.setElectionData(mergedElection);
 
-                List<NeighborData> mergedNeighbor = NeighborData.mergeNeighbors(preA.getNeighbors(), preB.getNeighbors());
+                List<NeighborData> mergedNeighbor = NeighborData.mergeNeighbors(mergedPrecinct, preA.getNeighbors(), preB.getNeighbors());
                 mergedPrecinct.setNeighbors(mergedNeighbor);
-                em.remove(preA);
-                em.remove(preB);
 
                 BoundaryError err = em.find(BoundaryError.class, errID);
                 err.setResolved(true);
@@ -86,9 +84,14 @@ public class BoundaryCorrectionService {
                 correction.setNewValue("New precinct:" + uid);
                 correction.setAssociatedError(err);
                 correction.setType(CorrectionType.MERGE_PRECINCT);
+          
                 em.persist(correction);
-                em.merge(mergedPrecinct);
+                em.persist(mergedPrecinct);
 
+                preA.setPrecinctGeoJSON("{\"type\": \"Point\", \"coordinates\": [0.0, 0.0]}");
+                preB.setPrecinctGeoJSON("{\"type\": \"Point\", \"coordinates\": [0.0, 0.0]}");
+                em.merge(preA);
+                em.merge(preB);
                 return mergedPrecinct;
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -98,6 +101,7 @@ public class BoundaryCorrectionService {
         }
         return null;
     }
+
 
     @Transactional
     public void updatePrecinctBoundary(Long errID, String uid, String newBoundary){

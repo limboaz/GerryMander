@@ -17,7 +17,6 @@ public class Precinct {
     private CongressionalDistrict congressionalDistrict;
     private String county;
     private String name;
-    private List<Error> errors;
     private List<ElectionData> electionData;
     private PopulationData populationData;
     private String precinctGeoJSON;
@@ -82,16 +81,6 @@ public class Precinct {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    @OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JsonManagedReference
-    public List<Error> getErrors() {
-        return errors;
-    }
-
-    public void setErrors(List<Error> errors) {
-        this.errors = errors;
     }
 
     @OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)

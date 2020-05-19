@@ -9,15 +9,15 @@ import java.util.List;
 
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class  Error {
+public abstract class Error {
     protected long id;
     protected ErrorType type;
     protected String dataSource;
-    protected Precinct precinct;
+    protected String precinctUid;
     protected State state;
     protected String congId;
     protected List<Correction> corrections;
-    private boolean isResolved = false;
+    protected Boolean isResolved;
 
     @Id
     @GeneratedValue
@@ -46,15 +46,12 @@ public abstract class  Error {
         this.dataSource = dataSource;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference
-    @JoinColumn(name = "precinct_uid")
-    public Precinct getPrecinct() {
-        return precinct;
+    public String getPrecinctUid() {
+        return precinctUid;
     }
 
-    public void setPrecinct(Precinct precinct) {
-        this.precinct = precinct;
+    public void setPrecinctUid(String precinctUid) {
+        this.precinctUid = precinctUid;
     }
 
     @OneToMany(mappedBy = "associatedError", cascade = CascadeType.ALL)
@@ -82,7 +79,7 @@ public abstract class  Error {
 
     public void setCongId(String congID){ this.congId = congID; }
 
-    public boolean ifResolved(){ return this.isResolved; }
+    public Boolean isResolved(){ return this.isResolved; }
 
-    public void setResolved(boolean status){ this.isResolved = status; }
+    public void setResolved(Boolean status){ this.isResolved = status; }
 }

@@ -41,7 +41,6 @@ public class DataService {
         }
 
         for (Precinct p: cd.getPrecincts()) {
-            p.setErrors(null);
             p.setNeighbors(null);
             p.setElectionData(null);
         }
@@ -77,7 +76,11 @@ public class DataService {
 
     public List<Error> getErrors(StatePostalCode state){
         logger.info("getErrors: state = " + state.name());
-        return new ArrayList<>(em.find(State.class, state).getErrors());
+        List<Error> errorsList = new ArrayList<>(em.find(State.class, state).getErrors());
+        for (Error e: errorsList) {
+            e.setCorrections(null);
+        }
+        return errorsList;
     }
 
     public List<Correction> getCorrectionLog() {
