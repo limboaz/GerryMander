@@ -49,7 +49,7 @@ export class AttributeMenuComponent implements OnInit {
   selector: 'app-corrections-log',
   templateUrl: 'corrections-log.component.html',
 })
-export class CorrectionsLogComponent {
+export class CorrectionsLogComponent implements OnInit{
   CorrectionType = CorrectionType;
 
   public dataSource: MatTableDataSource<Correction>;
@@ -57,11 +57,14 @@ export class CorrectionsLogComponent {
 
   constructor(public dialogRef: MatDialogRef<CorrectionsLogComponent>, @Inject(MAT_DIALOG_DATA) public corrections: Correction[]) {
     this.dataSource = new MatTableDataSource<Correction>(corrections);
-    this.dataSource.paginator = this.paginator;
   }
 
   onNoClick(): void {
     this.dialogRef.close();
+  }
+
+  ngOnInit(): void {
+    this.dataSource.paginator = this.paginator;
   }
 
 }

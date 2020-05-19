@@ -41,7 +41,7 @@ public class DataCorrectionService {
                 Correction correction = new Correction();
                 correction.setComment("Edited election data with id " + uid + ", errID " + errID);
                 correction.setTime(new Date(System.currentTimeMillis()));
-                correction.setAssociatedError(err);
+                correction.setAssociatedError(errID);
                 correction.setType(CorrectionType.ELECTION_DATA);
                 em.persist(correction);
             }catch (Exception e){
@@ -56,15 +56,19 @@ public class DataCorrectionService {
     public void editPopulationData(Long errID, String uid, PopulationData populationData){
         logger.info("editPopulationData: errID = " + errID + ", uid = " + uid);
         DataError err = em.find(DataError.class, errID);
+        Precinct precinct = em.find(Precinct.class, uid);
         if(err != null){
             try{
                 PopulationData oldPop = em.find(PopulationData.class, uid);
                 Correction correction = new Correction();
                 correction.setComment("Edited population data with id " + uid + ", errID " + errID);
                 correction.setTime(new Date(System.currentTimeMillis()));
-                correction.setOldValue(oldPop.toString());
+                if (oldPop != null) {
+                    correction.setOldValue(oldPop.toString());
+                }
+                populationData.setPrecinct(precinct);
                 correction.setNewValue(populationData.toString());
-                correction.setAssociatedError(err);
+                correction.setAssociatedError(errID);
                 correction.setType(CorrectionType.POPULATION_DATA);
 
                 em.merge(populationData);

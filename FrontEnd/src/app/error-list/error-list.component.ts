@@ -1,10 +1,11 @@
-import {Component, OnInit, Output, EventEmitter} from '@angular/core';
+import {Component, OnInit, Output, EventEmitter, ViewChildren, QueryList} from '@angular/core';
 import {Error} from '../../models/models';
 import * as L from 'leaflet';
 import {errorStyle} from '../styles';
 import {ErrorType} from '../../models/enums';
 import {HttpClient} from '@angular/common/http';
 import {loadRequest} from '../../PrecinctHelper';
+import {MatExpansionPanel} from '@angular/material/expansion';
 
 @Component({
   selector: 'app-error-list',
@@ -20,6 +21,7 @@ export class ErrorListComponent implements OnInit {
   errorTypeMap = {};
   @Output() notify = new EventEmitter();
   @Output() goToPrecinct = new EventEmitter();
+  @ViewChildren(MatExpansionPanel) matPanels: QueryList<MatExpansionPanel>;
 
   constructor(private http: HttpClient) {
     const capitalizeFirst = (s) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -32,12 +34,24 @@ export class ErrorListComponent implements OnInit {
   }
 
   goToError(error: Error) {
-    if (error.errorBoundaryGeoJSON) {
-      this.map.fitBounds(error.layer.getBounds());
-      this.map.addLayer(error.layer);
+    console.log(error);
+    if (this.selectedError !== error) {
+     if (error.errorBoundaryGeoJSON) {
+       this.map.fitBounds(error.layer.getBounds());
+       this.map.addLayer(error.layer);
+
+       if (this.selectedError) {
+         this.map.removeLayer(this.selectedError.layer);
+       }
+     }
+     this.goToPrecinct.emit(error.precinctUid);
+     this.selectedError = error;
+    } else {
+     if (this.selectedError.layer) {
+       this.map.removeLayer(this.selectedError.layer);
+     }
+     this.selectedError = undefined;
     }
-    this.goToPrecinct.emit(error.precinctUid);
-    this.selectedError = error;
   }
 
   addErrors(errors: Error[]) {
@@ -49,6 +63,7 @@ export class ErrorListComponent implements OnInit {
       if (error.errorBoundaryGeoJSON) {
         error.errorBoundaryGeoJSON = JSON.parse(error.errorBoundaryGeoJSON);
         error.layer = L.geoJSON(error.errorBoundaryGeoJSON, {style: errorStyle});
+        error.layer.on('click', () => this.goToError(error));
         this.errorsLayer.addLayer(error.layer);
       }
       if (this.currentErrors[error.type]) {
@@ -61,14 +76,20 @@ export class ErrorListComponent implements OnInit {
   }
 
   defineGhostPrecinct(error: Error) {
-    loadRequest(this.http.post('/boundarycorrection/defineghostprecinct', {errID: error.id}), id => {
+    loadRequest(this.http.post('/boundarycorrection/defineghostprecinct', {errID: error.id}, {responseType: 'text'}), id => {
       const p = {uid: id, precinctGeoJSON: JSON.stringify(error.errorBoundaryGeoJSON)};
       this.notify.emit(p);
       error.resolved = true;
     });
   }
 
-  resolveError(error: Error) {
-    error.resolved = true;
+  unSelectError() {
+    if (this.selectedError.layer) { this.map.removeLayer(this.selectedError.layer); }
+    for (const panel of this.matPanels.toArray()) {
+      if (panel.expanded) {
+        panel.close();
+      }
+    }
+    this.selectedError = undefined;
   }
 }

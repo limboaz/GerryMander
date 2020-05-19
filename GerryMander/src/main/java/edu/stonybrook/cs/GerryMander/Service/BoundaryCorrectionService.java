@@ -54,7 +54,7 @@ public class BoundaryCorrectionService {
 
                 Precinct mergedPrecinct = new Precinct();
                 mergedPrecinct.setPrecinctGeoJSON(mergedBoundary);
-                String uid = preA.getState().name() + "_" + preA.getCounty() + "_" + preA.getName() + preB.getName();
+                String uid = preA.getState().name() + "_" + preA.getCounty() + "_" + preA.getName() + "+" + preB.getName();
                 uid = uid.replaceAll(" ", "_").toUpperCase();
                 mergedPrecinct.setUid(uid);
 
@@ -82,7 +82,7 @@ public class BoundaryCorrectionService {
                 correction.setTime(new Date(System.currentTimeMillis()));
                 correction.setOldValue("precinct A:" + precinctA + ", precinct B: " + precinctB);
                 correction.setNewValue("New precinct:" + uid);
-                correction.setAssociatedError(err);
+                correction.setAssociatedError(errID);
                 correction.setType(CorrectionType.MERGE_PRECINCT);
           
                 em.persist(correction);
@@ -122,7 +122,7 @@ public class BoundaryCorrectionService {
                 correction.setTime(new Date(System.currentTimeMillis()));
                 correction.setOldValue(oldBoundary);
                 correction.setNewValue(newBoundary);
-                correction.setAssociatedError(err);
+                correction.setAssociatedError(errID);
                 correction.setType(CorrectionType.BOUNDARY_CHANGE);
                 em.persist(correction);
             }
@@ -140,9 +140,14 @@ public class BoundaryCorrectionService {
         BoundaryError err = em.find(BoundaryError.class, errID);
         if(err != null){
             try {
-                String uid = err.getState().getName() + "_" + err.getCongId() + "_" + errID;
+                logger.info(err.getCongId(), err.getId());
+                CongressionalDistrict district = em.find(CongressionalDistrict.class, Long.parseLong(err.getCongId()));
+                String uid = err.getState().getState().name() + "_" + err.getCongId() + "_" +  "GHOST" + errID;
                 Precinct precinct = new Precinct(uid);
                 precinct.setPrecinctGeoJSON(err.getErrorBoundaryGeoJSON());
+                precinct.setCongressionalDistrict(district);
+                precinct.setState(err.getState().getState());
+                precinct.setName("GHOST" + errID);
                 em.persist(precinct);
 
                 err.setResolved(true);
@@ -152,7 +157,7 @@ public class BoundaryCorrectionService {
                 correction.setComment("Generating ghost precinct with id " + uid + ", errID " + errID);
                 correction.setTime(new Date(System.currentTimeMillis()));
                 correction.setNewValue(uid);
-                correction.setAssociatedError(err);
+                correction.setAssociatedError(errID);
                 correction.setType(CorrectionType.GHOST_DESIGNATION);
                 em.persist(correction);
 

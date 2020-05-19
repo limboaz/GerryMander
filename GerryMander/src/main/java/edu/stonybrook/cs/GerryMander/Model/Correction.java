@@ -14,7 +14,7 @@ public class Correction {
     private String comment;
     private String oldValue;
     private String newValue;
-    private Error associatedError;
+    private Long associatedError;
 
     @Id
     @GeneratedValue
@@ -69,14 +69,12 @@ public class Correction {
         this.newValue = newValue;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "error_id")
-    @JsonBackReference
-    public Error getAssociatedError() {
+    @Column(name = "error_id")
+    public Long getAssociatedError() {
         return associatedError;
     }
 
-    public void setAssociatedError(Error associatedError) {
+    public void setAssociatedError(Long associatedError) {
         this.associatedError = associatedError;
     }
 }

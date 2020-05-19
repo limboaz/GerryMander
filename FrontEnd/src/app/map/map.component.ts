@@ -101,7 +101,9 @@ export class MapComponent implements AfterViewInit {
           this.map.removeLayer(this.districtsLayer);
           this.marker.setLatLng([0, 0]);
           this.infoSidenav.sidenav.close();
-          this.selectedPrecinct = undefined;
+          if (this.selectedPrecinct) {
+            this.selectPrecinct(this.selectedPrecinct);
+          }
           this.map.removeLayer(this.errorList.errorsLayer);
         }
       });
@@ -206,15 +208,21 @@ export class MapComponent implements AfterViewInit {
       this.selectPrecinct(this.uidToPrecinctMap[feature.properties.uid]);
 
       if (!this.modifyingPrecinct) {
-        this.marker.setLatLng(e.latlng);
+        this.marker.setLatLng(this.uidToPrecinctMap[feature.properties.uid].layer.getBounds().getCenter());
         this.getPrecinctData(feature.properties.uid);
       }
     };
   }
 
   onPrecinctMouseOver(feature, layer) {
-    return () => layer.bindTooltip('Name: ' + layer.wrapperPrecinct.name
-      + '</br> Total Population: ' + layer.wrapperPrecinct.populationData.total.toLocaleString()).openTooltip();
+    return () => {
+      if (layer.wrapperPrecinct.populationData) {
+        layer.bindTooltip('Name: ' + layer.wrapperPrecinct.name
+          + '</br> Total Population: ' + layer.wrapperPrecinct.populationData.total.toLocaleString()).openTooltip();
+      } else {
+        layer.bindTooltip('Name: ' + layer.wrapperPrecinct.name).openTooltip();
+      }
+    };
   }
 
   getPrecinctData(uid: string) {
@@ -361,7 +369,7 @@ export class MapComponent implements AfterViewInit {
     if (this.uidToPrecinctMap[precinctUid]) {
       this.map.addLayer(this.uidToPrecinctMap[precinctUid].layer);
       this.map.fitBounds(this.uidToPrecinctMap[precinctUid].layer.getBounds());
-      this.selectPrecinct(this.uidToPrecinctMap[precinctUid]);
+      this.uidToPrecinctMap[precinctUid].layer.fire('click');
     }
   }
 }

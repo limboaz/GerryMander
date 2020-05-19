@@ -3,6 +3,7 @@
     <mat-panel-title>
       <strong>Potential errors detected</strong>
     </mat-panel-title>
+    <mat-panel-description *ngIf="selectedError"><button color="warn" (click)="unSelectError()" mat-raised-button>Unselect Error</button></mat-panel-description>
   </mat-expansion-panel-header>
   <mat-accordion multi="true">
     <mat-expansion-panel *ngFor="let errorType of errorKeys" class="expansion-panel">
@@ -12,8 +13,9 @@
         </mat-panel-title>
       </mat-expansion-panel-header>
 
+      <mat-accordion >
       <div *ngIf="currentErrors[errorType]">
-        <mat-expansion-panel
+        <mat-expansion-panel #panel
           *ngFor="let error of currentErrors[errorType].slice(paginator.pageSize*paginator.pageIndex, paginator.pageSize*paginator.pageIndex + paginator.pageSize)"
           [style.background-color]="error.resolved ? '#78BD8F' : ''">
           <mat-expansion-panel-header (click)="goToError(error)">
@@ -24,15 +26,17 @@
           <a href="https://{{error.dataSource}}" target="_blank">
             <button mat-button>{{error.dataSource}}</button>
           </a>
-          <br/>{{error.precinctUid.split('_').join(' ')}}
+          <br/>{{error.precinctUid ? error.precinctUid.split('_').join(' ') : ''}}
           <div><br/>
             <button mat-raised-button color="accent" *ngIf="errorType === 'UNASSIGNED_AREA'" (click)="defineGhostPrecinct(error)">
               Define Ghost Precinct
             </button>
           </div>
         </mat-expansion-panel>
-        <mat-paginator #paginator [pageSize]="10"></mat-paginator>
+        <br/>
+        <mat-paginator #paginator [pageSize]="10" [length]="currentErrors[errorType].length"></mat-paginator>
       </div>
+      </mat-accordion>
     </mat-expansion-panel>
   </mat-accordion>
 </mat-expansion-panel>

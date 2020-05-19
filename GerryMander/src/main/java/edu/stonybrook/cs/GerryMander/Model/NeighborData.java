@@ -35,6 +35,7 @@ public class NeighborData {
         int counter = 0;
         for(NeighborData neighbor: mergedNeighbors) {
             mergedNeighborList.add(new NeighborData(precinct.getUid() + "_NEIGHBOR_" + counter, precinct, neighbor.getNeighborID()));
+            counter++;
         }
         return mergedNeighborList;
     }

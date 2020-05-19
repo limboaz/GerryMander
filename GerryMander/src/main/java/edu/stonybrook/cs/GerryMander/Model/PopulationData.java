@@ -40,6 +40,17 @@ public class PopulationData {
         PopulationData popA = precinctA.getPopulationData();
         PopulationData popB = precinctB.getPopulationData();
 
+        if (popA == null && popB == null) {
+            PopulationData newPop = new PopulationData();
+            newPop.setId(mergedPrecinct.getUid() + "_POP_" + 0);
+            return newPop;
+        } else if (popA == null) {
+            return new PopulationData(mergedPrecinct.getUid() + "_POP_" + popB.getTotal(), popB.getTotal(), popB.getWhite(), popB.getBlack(),
+                    popB.getAsian(), popB.getHispanic(), popB.getNativeAmerican(), popB.getPacificIslander(), popB.getOther(), mergedPrecinct);
+        } else if (popB == null) {
+            return new PopulationData(mergedPrecinct.getUid() + "_POP_" + popA.getTotal(), popA.getTotal(), popA.getWhite(), popA.getBlack(),
+                    popA.getAsian(), popA.getHispanic(), popA.getNativeAmerican(), popA.getPacificIslander(), popA.getOther(), mergedPrecinct);
+        }
         return new PopulationData(mergedPrecinct.getUid() + "_POP_" + popA.getTotal(), popA.getTotal() + popB.getTotal(), popA.getWhite() + popB.getWhite(), popA.getBlack() + popB.getBlack(),
                 popA.getAsian() + popB.getAsian(), + popA.getHispanic() + popB.getHispanic(), + popA.getNativeAmerican() + popB.getNativeAmerican(),
                 popA.getPacificIslander() + popB.getPacificIslander(), popA.getOther() + popB.getOther(), mergedPrecinct);
