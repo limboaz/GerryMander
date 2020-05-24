@@ -138,17 +138,17 @@ for i,d in congressional_districts.iterrows():
 	state_to_districts[d["STATE"]].append({"bdy": d["BDY"], "district": d["DISTRICT"]})
 
 for state_id, state in enumerate(states):
-	#aztecs_dev.execute(insert_state, (int(state_id), state_names[state], json.dumps(state_boundaries[state])))
+	aztecs_dev.execute(insert_state, (int(state_id), state_names[state], json.dumps(state_boundaries[state])))
 
 	for district in state_to_districts[state]:
-		#aztecs_dev.execute(insert_district, (int(str(int(district['district'])) + str(state_id)), district['bdy'], int(district['district']), int(state_id), int(state_id)))
+		aztecs_dev.execute(insert_district, (int(str(int(district['district'])) + str(state_id)), district['bdy'], int(district['district']), int(state_id), int(state_id)))
 		pass
 
 dup_data_errors = [r for i,r in pandas.read_csv('duplicatebois/errors.csv', index_col=None).iterrows()]
 dup_boundary_errors = [r for i,r in pandas.read_csv('duplicatebois/errors_mp.csv', index_col=None).iterrows()]
 
-#insert_csv_into_db('duplicatebois/precincts.csv', insert_precinct, precincts_csv_columns, "UID", True)
-#pop_data_id = insert_csv_into_db('duplicatebois/demographics.csv', insert_population, population_csv_columns, pop_data_id, True)
+insert_csv_into_db('duplicatebois/precincts.csv', insert_precinct, precincts_csv_columns, "UID", True)
+pop_data_id = insert_csv_into_db('duplicatebois/demographics.csv', insert_population, population_csv_columns, pop_data_id, True)
 election_data_id = insert_csv_into_db('duplicatebois/elections.csv', insert_election, election_csv_columns, election_data_id, True)
 
 boundary_errors = []
@@ -159,24 +159,24 @@ for r in dup_boundary_errors:
 		district_id = int(str(int(r["districtAssociated"])) + str(states.index(r["StateId"])))
 	boundary_errors.append((error_id, district_id, r["Datasource"], BoundaryErrorType.index(r["Type"]), r["PrecinctsAssociated"], states.index(r["StateID"]), r["GeoJSON"]))
 	error_id+=1
-#aztecs_dev.executemany(insert_boundary_errors, boundary_errors)	
+aztecs_dev.executemany(insert_boundary_errors, boundary_errors)	
 
 data_errors = []
 for r in dup_data_errors:
 	duplicates[r["PrecinctsAssociated"]] = 1
 	data_errors.append((error_id, 0, r["Datasource"], DataErrorType.index(r["Type"]) + 5, r["PrecinctsAssociated"], states.index(r["StateID"])))
 	error_id+=1
-#aztecs_dev.executemany(insert_data_errors, data_errors)
+aztecs_dev.executemany(insert_data_errors, data_errors)
 
 for state_id, state in enumerate(states[0:1]):
 	print(state, "Precincts")
-	#insert_csv_into_db(state_precincts % state, insert_precinct, precincts_csv_columns, "UID")
+	insert_csv_into_db(state_precincts % state, insert_precinct, precincts_csv_columns, "UID")
 	print(state, "Population")
-	#pop_data_id = insert_csv_into_db(state_demographics % state, insert_population, population_csv_columns, pop_data_id)
+	pop_data_id = insert_csv_into_db(state_demographics % state, insert_population, population_csv_columns, pop_data_id)
 	print(state, "Election")
 	election_data_id = insert_csv_into_db(state_election % state, insert_election, election_csv_columns, election_data_id, False, True, True)
 	print(state, "Neighbors")
-	#neighbor_id = insert_csv_into_db(state_neighbors % state, insert_neighbors, ["neighborid", "precinct_uid"], neighbor_id, False, False)
+	neighbor_id = insert_csv_into_db(state_neighbors % state, insert_neighbors, ["neighborid", "precinct_uid"], neighbor_id, False, False)
 	
 	print(state, "Boundary Errors")
 	errors = pandas.read_csv(state_errors % state)
@@ -191,10 +191,10 @@ for state_id, state in enumerate(states[0:1]):
 				district_id = int(str(int(r["districtAssociated"])) + str(state_id))
 				aztecs_dev.execute(insert_unassigned_area, (error_id, district_id, r["Datasource"], BoundaryErrorType.index(r["Type"]), state_id, r["GeoJSON"]))
 			else:
-				#boundary_data.append((error_id, district_id, r["Datasource"], BoundaryErrorType.index(r["Type"]), precinct, state_id, r["GeoJSON"]))
+				boundary_data.append((error_id, district_id, r["Datasource"], BoundaryErrorType.index(r["Type"]), precinct, state_id, r["GeoJSON"]))
 				pass
 		else:
-			#data_errors_data.append((error_id, "NULL", r["Datasource"], DataErrorType.index(r["Type"]) + 5, r["PrecinctsAssociated"], state_id))
+			data_errors_data.append((error_id, "NULL", r["Datasource"], DataErrorType.index(r["Type"]) + 5, r["PrecinctsAssociated"], state_id))
 			pass
 		error_id+=1
 	aztecs_dev.executemany(insert_boundary_errors, boundary_data)
